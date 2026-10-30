@@ -211,7 +211,7 @@ function registration() {
   setView("form");
   $("panel").className = "panel";
   $("panel").innerHTML =
-    `<h1>次の目的地は、宇宙。</h1>
+    `<h1 class="brand-heading">SPACE LINE</h1><p class="brand-subtitle">22世紀の宇宙交通</p>
   <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="20" placeholder="例：そら" autocomplete="nickname">
   <label>アバター *</label><div class="avatars">${[1, 2, 3, 4].map((i) => `<label><img src="assets/avatar-${i}.svg" alt="宇宙飛行士 ${i}"><input type="radio" name="avatar" value="${i}" ${i === (profile?.avatarId || 1) ? "checked" : ""}></label>`).join("")}</div>
   <label id="birthday-label">生年月日（任意）</label><div class="birthday-fields" role="group" aria-labelledby="birthday-label"><select id="birth-year" aria-label="年"><option value="">年</option>${Array.from(
@@ -402,21 +402,11 @@ async function makePoster() {
   c.width = 1080;
   c.height = 1800;
   const x = c.getContext("2d");
-  const bg = x.createLinearGradient(0, 0, 1080, 1800);
-  bg.addColorStop(0, "#251206");
-  bg.addColorStop(0.6, "#482a16");
-  bg.addColorStop(1, "#140a03");
-  x.fillStyle = bg;
+  if (document.fonts?.ready) await document.fonts.ready;
+  x.fillStyle = "#1e1009";
   x.fillRect(0, 0, 1080, 1800);
-  let seed = 92;
-  for (let i = 0; i < 320; i++) {
-    seed = (seed * 16807) % 2147483647;
-    const a = seed / 2147483647;
-    seed = (seed * 16807) % 2147483647;
-    const b = seed / 2147483647;
-    x.fillStyle = `rgba(255,193,151,${0.15 + a * 0.65})`;
-    x.fillRect(a * 1080, b * 1300, a < 0.8 ? 2 : 4, a < 0.8 ? 2 : 4);
-  }
+  x.fillStyle = "#ff812e";
+  x.fillRect(0, 0, 1080, 22);
   // 選んだ惑星のテクスチャを球面に投影して、立体的な主役を描きます。
   const texture = await loadImage(
     `textures/${r.planetId}/${r.planetId === "earth" ? "earth_day" : r.planetId}.webp`,
@@ -467,68 +457,62 @@ async function makePoster() {
       out.data[j + 3] = Math.min(255, (1 - d) * 14000);
     }
   bx.putImageData(out, 0, 0);
-  x.save();
-  x.shadowColor = "#fcac77";
-  x.shadowBlur = 55;
-  x.drawImage(ball, 260, 340);
-  x.restore();
-  const text = (t, px, py, size, color = "#fff8f4", weight = "400") => {
+  // 余白と端正な文字組みで構成する、旅の記念ポスター。
+  const sans = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+  const serif = sans;
+  const text = (t, px, py, size, color = "#fff1e5", weight = "400", family = sans) => {
     x.fillStyle = color;
-    x.font = `${weight} ${size}px Arial, "Yu Gothic", sans-serif`;
+    x.font = `${weight} ${size}px ${family}`;
     x.fillText(t, px, py);
   };
-  text("SPACE LINE", 65, 94, 28, "#ecccb7", "700");
-  text("2127", 875, 94, 28, "#ecccb7");
-  text("宇宙へ、", 60, 225, 100, "#fff", "800");
-  text("まもなく出発。", 65, 321, 85, "#fff", "800");
-  text("CHECK-IN / 2127", 70, 378, 24, "#d2b29d");
-  text(displayNames[r.planetId], 65, 1085, 88, "#fff", "800");
-  text(
-    `${displayNames[r.planetId]} / CHECK-IN ${r.slotId.split("-")[1]}`,
-    70,
-    1134,
-    28,
-    "#fdcaa8",
-  );
-  x.fillStyle = "#2b1709";
-  x.fillRect(44, 1190, 992, 548);
-  x.fillStyle = "#fcbb8f";
-  x.fillRect(44, 1190, 8, 548);
-  const avatar = await loadImage(`assets/avatar-${r.avatarId}.svg`);
-  x.drawImage(avatar, 76, 1225, 100, 100);
-  text("TRAVELER", 205, 1250, 19, "#c4a48f", "700");
-  let ns = 42;
-  while (ns > 22) {
-    x.font = `700 ${ns}px Arial, "Yu Gothic", sans-serif`;
-    if (x.measureText(r.username).width < 480) break;
-    ns--;
+  const fit = (t, px, py, size, width, color, family = sans) => {
+    while (size > 16) {
+      x.font = `400 ${size}px ${family}`;
+      if (x.measureText(t).width <= width) break;
+      size--;
+    }
+    text(t, px, py, size, color, "400", family);
+  };
+  text("SPACE LINE", 72, 100, 25, "#ff9a56", "600");
+  text("2127", 912, 100, 25, "#ff9a56");
+  x.fillStyle = "#ff9a5650"; x.fillRect(72, 130, 936, 1);
+  x.save();
+  x.font = '500 106px Arial, sans-serif';
+  x.fillStyle = '#fff1e5';
+  let logoX = 68;
+  for (const letter of 'SPACE LINE') {
+    x.fillText(letter, logoX, 280);
+    logoX += x.measureText(letter).width + 7;
   }
-  text(r.username, 205, 1308, ns, "#fff8f3", "700");
-  if (profile?.birthday)
-    text(
-      "BORN / " + profile.birthday.replaceAll("-", "."),
-      720,
-      1295,
-      20,
-      "#c4a48f",
-    );
-  text(r.ticketId, 78, 1397, 56, "#eab693", "700");
-  text("DESTINATION / " + displayNames[r.planetId], 80, 1444, 23, "#dfc2ae");
-  if (profile?.region) text("FROM " + profile.region, 80, 1487, 22, "#dfc2ae");
-  const msg = r.message || "また、未来の宇宙で会いましょう。";
-  let line = "",
-    row = 0;
-  x.font = '25px Arial, "Yu Gothic", sans-serif';
+  x.restore();
+  text("— 22世紀の宇宙交通 —", 76, 355, 30, "#d9aa88");
+  x.save();
+  x.shadowColor = "#ff812e40"; x.shadowBlur = 35;
+  x.drawImage(ball, 245, 405);
+  x.restore();
+  text(r.planetId.toUpperCase(), 76, 1088, 28, "#ff9a56");
+  text("地点 " + r.slotId.split("-")[1], 76, 1130, 24, "#d9aa88");
+  // 下段は淡いオレンジの紙面。情報を同じ左端に揃えます。
+  x.fillStyle = "#ffead9"; x.fillRect(0, 1180, 1080, 620);
+  const avatar = await loadImage(`assets/avatar-${r.avatarId}.svg`);
+  x.drawImage(avatar, 76, 1230, 78, 78);
+  fit(r.username, 183, 1283, 40, 490, "#351a0c");
+  text(r.ticketId, 76, 1388, 44, "#a5480e", "500");
+  x.fillStyle = "#a5480e35"; x.fillRect(76, 1422, 580, 1);
+  if (profile?.region) fit(profile.region + " 発", 76, 1471, 23, 560, "#754a30");
+  if (profile?.birthday) text(profile.birthday.replaceAll("-", "."), 76, 1510, 21, "#754a30");
+  const msg = r.message || "";
+  let line = "", row = 0;
+  x.font = `28px ${serif}`;
   for (const ch of msg) {
-    if (x.measureText(line + ch).width > 570) {
-      text(line, 80, 1550 + row * 36, 25, "#f5eae2");
-      line = "";
-      row++;
+    if (ch === "\n" || x.measureText(line + ch).width > 550) {
+      text(line, 76, 1570 + row * 42, 28, "#351a0c", "400", serif);
+      line = ""; row++; x.font = `28px ${serif}`;
+      if (ch === "\n") continue;
     }
     line += ch;
   }
-  text(line, 80, 1550 + row * 36, 25, "#f5eae2");
-  text("DEPARTURE / 2127", 80, 1695, 20, "#c4a48f");
+  text(line, 76, 1570 + row * 42, 28, "#351a0c", "400", serif);
   const payload = {
     version: 1,
     id: r.id,
@@ -553,15 +537,16 @@ async function makePoster() {
     qr = null;
   }
   if (!qr) {
-    x.strokeStyle = "#b08b73";
-    x.setLineDash([7, 7]);
+    x.strokeStyle = "#a5480e55";
+    x.setLineDash([]);
     x.strokeRect(720, 1370, 270, 270);
     x.setLineDash([]);
-    text("QR CODE", 760, 1495, 27, "#dfbfaa", "700");
-    text("SPACE LINE", 770, 1540, 20, "#dfbfaa");
+    text("SPACE LINE", 767, 1504, 20, "#a5480e");
+    
   }
-  text("SOUVENIR PASS", 739, 1695, 20, "#c4a48f");
-  text("SPACE LINE / 2127", 65, 1773, 18, "#b99882");
+  
+  text("SPACE LINE", 76, 1760, 18, "#a5480e");
+  text("2127 / JOURNEY ARCHIVE", 710, 1760, 18, "#a5480e");
   return { url: c.toDataURL("image/png"), hasQR: !!qr };
 }
 async function showPoster() {
@@ -573,7 +558,7 @@ async function showPoster() {
     const result = await makePoster();
     posterUrl = result.url;
     $("panel").innerHTML =
-      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">みんなの宇宙を見る</button><button id="edit-message">メッセージを変更</button><button id="next-person">新しい参加者として始める</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
+      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">宇宙に戻る</button><button id="edit-message">メッセージを編集</button><button id="next-person">新しくはじめる</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
     $("poster").src = posterUrl;
     $("download").href = posterUrl;
     $("all").onclick = () => explore(true);
