@@ -1,0 +1,345 @@
+.top {
+  position: fixed;
+  z-index: 5;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 22px;
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(#050914e8, transparent);
+  pointer-events: none;
+}
+.top b {
+  letter-spacing: 0.13em;
+}
+.top small {
+  color: #82e4ff;
+}
+.top span {
+  font-size: 11px;
+  color: #b2c0cf;
+}
+.panel {
+  position: fixed;
+  z-index: 8;
+  inset: 80px auto 20px 5%;
+  width: min(430px, 90%);
+  overflow: auto;
+  background: #081323ed;
+  border: 1px solid #4a637b;
+  border-radius: 18px;
+  padding: 25px;
+  backdrop-filter: blur(15px);
+}
+.panel:empty {
+  display: none;
+}
+h1 {
+  font-size: 27px;
+  margin: 5px 0 15px;
+}
+p {
+  line-height: 1.7;
+  color: #c3d0df;
+}
+label {
+  display: block;
+  margin: 16px 0 7px;
+}
+input,
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  background: #101f32;
+  color: white;
+  border: 1px solid #607387;
+  border-radius: 8px;
+  padding: 11px;
+  font: inherit;
+}
+button,
+.button {
+  cursor: pointer;
+  border: 1px solid #57728b;
+  border-radius: 8px;
+  background: #15283f;
+  padding: 11px 15px;
+  color: #fff;
+  font: inherit;
+  text-decoration: none;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+.primary {
+  background: #b9edff;
+  color: #082039;
+  border: 0;
+  font-weight: 700;
+}
+.avatars {
+  display: flex;
+  gap: 10px;
+}
+.avatars label {
+  margin: 0;
+  cursor: pointer;
+}
+.avatars input {
+  width: auto;
+}
+.avatars img {
+  width: 46px;
+  height: 46px;
+  display: block;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.hint {
+  font-size: 12px;
+  color: #9daec1;
+}
+.error {
+  color: #ffacac;
+}
+#planet-nav {
+  position: fixed;
+  z-index: 5;
+  top: 64px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  gap: 7px;
+  overflow: auto;
+  padding: 8px;
+}
+#planet-nav[hidden] {
+  display: none;
+}
+#planet-nav button {
+  white-space: nowrap;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: #0a182be8;
+}
+#guide {
+  position: fixed;
+  z-index: 5;
+  bottom: 20px;
+  left: 16px;
+  right: 16px;
+  pointer-events: none;
+}
+#guide p {
+  font-size: 12px;
+  max-width: 460px;
+  text-shadow: 0 2px 4px black;
+}
+#guide button {
+  pointer-events: auto;
+  background: #0b192fe8;
+  margin-right: 8px;
+}
+.spot {
+  padding: 0;
+  width: 19px;
+  height: 19px;
+  border: 3px solid #ffffff80;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px #a3dfff;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+.spot.occupied {
+  width: 34px;
+  height: 34px;
+  border: 2px solid #8de6ff;
+  background: #163652;
+  overflow: hidden;
+}
+.spot img {
+  width: 100%;
+  height: 100%;
+}
+dialog {
+  background: #0c1b2e;
+  color: white;
+  border: 1px solid #6289aa;
+  border-radius: 18px;
+  width: min(360px, 86vw);
+  padding: 24px;
+}
+dialog::backdrop {
+  background: #0009;
+  backdrop-filter: blur(4px);
+}
+dialog img {
+  width: 65px;
+}
+.poster-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.panel.poster {
+  inset: 75px auto 15px 50%;
+  transform: translateX(-50%);
+  width: min(430px, 94vw);
+}
+.loader {
+  z-index: 7;
+  pointer-events: none;
+}
+a {
+  color: #9ee7ff;
+}
+@media (max-width: 600px) {
+  .top {
+    padding: 18px 15px;
+  }
+  .top span {
+    max-width: 135px;
+    text-align: right;
+  }
+  .panel {
+    padding: 22px;
+    inset: 76px 5% 20px;
+  }
+  .top b {
+    font-size: 14px;
+  }
+  #guide {
+    bottom: max(18px, env(safe-area-inset-bottom));
+  }
+}
+
+/* フォームとポスターはスマホでも自然に縦スクロールできます。 */
+[hidden] {
+  display: none !important;
+}
+body[data-view="form"] {
+  overflow: auto;
+  height: auto;
+  min-height: 100dvh;
+  background: radial-gradient(
+    ellipse at 85% 5%,
+    #123452 0%,
+    #07101e 45%,
+    #030710 100%
+  );
+}
+body[data-view="form"] #app,
+body[data-view="form"] .labels {
+  display: none;
+}
+body[data-view="form"] .panel,
+body[data-view="form"] .panel.poster {
+  position: relative;
+  inset: auto;
+  transform: none;
+  width: min(480px, calc(100% - 32px));
+  box-sizing: border-box;
+  margin: 90px auto 32px;
+  overflow: visible;
+}
+body[data-view="form"] #mode {
+  display: none;
+}
+input,
+textarea {
+  font-size: 16px;
+}
+#planet-nav,
+#guide,
+.top {
+  z-index: 6;
+}
+#guide {
+  padding: 10px;
+  border-radius: 16px;
+  background: linear-gradient(transparent, #030915e8);
+}
+.spot {
+  width: 26px;
+  height: 26px;
+  border: 5px solid #ffffff60;
+  background-clip: padding-box;
+}
+@media (max-width: 600px) {
+  h1 {
+    font-size: 25px;
+  }
+  .actions > * {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+  #guide button {
+    font-size: 12px;
+    padding: 10px;
+    margin: 3px;
+  }
+  #guide p {
+    margin: 4px;
+  }
+}
+body[data-view="form"] > canvas {
+  display: none;
+}
+
+/* 年月日を直接選べる、コンパクトな入力欄。 */
+.birthday-fields {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 8px;
+}
+.birthday-fields select {
+  min-width: 0;
+  width: 100%;
+  padding: 12px 8px;
+  color: #eaf5ff;
+  background: #101f32;
+  border: 1px solid #526a80;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 16px;
+  color-scheme: dark;
+}
+.avatars label {
+  position: relative;
+  padding: 7px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.avatars label:has(input:checked) {
+  border-color: #a5e6ff;
+  background: #224562;
+  box-shadow: 0 0 0 3px #a5e6ff18;
+}
+.avatars input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.avatars label:focus-within {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+#planet-nav button {
+  border-radius: 20px;
+  border-color: #7ea6c530;
+}
+#planet-nav button[aria-pressed="true"] {
+  background: #d3f0fc;
+  color: #092138;
+}

@@ -1,0 +1,14 @@
+{
+  "name": "space-line-checkin",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build:solar": "esbuild solar/solar.js --bundle --format=esm --outfile=solar/solar.bundle.js"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "three": "0.186.1"
+  }
+}
