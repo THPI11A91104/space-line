@@ -1,16 +1,16 @@
 :root {
-  --color-background: #010208;
-  --color-text: #f5f7ff;
-  --color-text-muted: rgb(225 232 250 / 58%);
-  --color-text-subtle: rgb(230 236 255 / 55%);
-  --color-text-button: rgb(235 240 255 / 72%);
+  --color-background: #080401;
+  --color-text: #fff9f5;
+  --color-text-muted: rgb(255 161 94 / 58%);
+  --color-text-subtle: rgb(255 161 94 / 55%);
+  --color-text-button: rgb(255 161 94 / 72%);
   --color-border: rgb(255 255 255 / 10%);
   --color-border-subtle: rgb(255 255 255 / 7%);
-  --color-surface: rgb(8 11 20 / 82%);
+  --color-surface: rgb(255 161 94 / 82%);
   --color-surface-hover: rgb(255 255 255 / 8%);
   --color-surface-subtle: rgb(255 255 255 / 3.5%);
-  --color-accent: #759cff;
-  --color-accent-light: #8fb4ff;
+  --color-accent: #fcad78;
+  --color-accent-light: #fcbc92;
   --font-family: inter, ui-sans-serif, system-ui, -apple-system, blinkmacsystemfont, 'Segoe UI', sans-serif;
   --radius-panel: 16px;
   --radius-control: 8px;
@@ -30,7 +30,7 @@ body {
 }
 
 body {
-  background: radial-gradient(circle at 70% 30%, rgb(54 65 150 / 14%), transparent 35%), var(--color-background);
+  background: radial-gradient(circle at 70% 30%, rgb(255 161 94 / 14%), transparent 35%), var(--color-background);
   color: var(--color-text);
   font-family: var(--font-family);
   font-synthesis: none;
@@ -65,7 +65,7 @@ canvas {
   box-shadow:
     0 20px 50px rgb(0 0 0 / 40%),
     inset 0 1px 0 rgb(255 255 255 / 5%);
-  color: #eef2ff;
+  color: #fff5ee;
   left: 24px;
 
   /* Without a scroll the panel silently clips its own controls on short
@@ -118,7 +118,7 @@ canvas {
 }
 
 .ui__section-title {
-  color: rgb(190 202 230 / 55%);
+  color: rgb(255 161 94 / 55%);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -167,13 +167,13 @@ canvas {
 }
 
 .planet-button--active {
-  background: rgb(110 150 255 / 14%);
-  border-color: rgb(120 160 255 / 35%);
+  background: rgb(255 161 94 / 14%);
+  border-color: rgb(255 161 94 / 35%);
   color: #fff;
 }
 
 .planet-button__dot {
-  background: rgb(190 200 225 / 40%);
+  background: rgb(255 161 94 / 40%);
   border-radius: 50%;
   flex: 0 0 6px;
   height: 6px;
@@ -182,7 +182,7 @@ canvas {
 
 .planet-button--active .planet-button__dot {
   background: var(--color-accent-light);
-  box-shadow: 0 0 8px rgb(120 160 255 / 80%);
+  box-shadow: 0 0 8px rgb(255 161 94 / 80%);
 }
 
 /* --------------------------------------------------
@@ -208,7 +208,7 @@ canvas {
 
 .speed-header {
   align-items: center;
-  color: rgb(225 232 250 / 70%);
+  color: rgb(255 161 94 / 70%);
   display: flex;
   font-size: 12px;
   justify-content: space-between;
@@ -239,7 +239,7 @@ canvas {
   background: var(--color-accent);
   border: 2px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 12px rgb(100 145 255 / 70%);
+  box-shadow: 0 0 12px rgb(255 161 94 / 70%);
   height: 14px;
   width: 14px;
 }
@@ -248,7 +248,7 @@ canvas {
   background: var(--color-accent);
   border: 2px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 12px rgb(100 145 255 / 70%);
+  box-shadow: 0 0 12px rgb(255 161 94 / 70%);
   height: 14px;
   width: 14px;
 }
@@ -266,10 +266,10 @@ canvas {
 }
 
 .ui-button {
-  background: rgb(100 140 255 / 14%);
-  border: 1px solid rgb(130 165 255 / 35%);
+  background: rgb(255 161 94 / 14%);
+  border: 1px solid rgb(255 161 94 / 35%);
   border-radius: var(--radius-control);
-  color: #eaf0ff;
+  color: #fef3eb;
   cursor: pointer;
   font-size: 11px;
   font-weight: 600;
@@ -280,8 +280,8 @@ canvas {
 }
 
 .ui-button:hover {
-  background: rgb(100 140 255 / 24%);
-  border-color: rgb(150 180 255 / 50%);
+  background: rgb(255 161 94 / 24%);
+  border-color: rgb(255 161 94 / 50%);
 }
 
 .ui-button:focus-visible {
@@ -459,7 +459,7 @@ canvas {
 }
 
 .planet-label {
-  background: rgb(5 8 20 / 55%);
+  background: rgb(255 161 94 / 55%);
   border: 1px solid var(--color-border);
   border-radius: 999px;
   color: var(--color-text);
