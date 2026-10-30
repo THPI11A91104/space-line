@@ -403,7 +403,7 @@ async function makePoster() {
   c.height = 1800;
   const x = c.getContext("2d");
   if (document.fonts?.ready) await document.fonts.ready;
-  x.fillStyle = "#fff4e2";
+  x.fillStyle = "#ff7900";
   x.fillRect(0, 0, 1080, 1800);
   // 選んだ惑星のテクスチャを球面に投影して、立体的な主役を描きます。
   const texture = await loadImage(
@@ -452,14 +452,14 @@ async function makePoster() {
       const light =
         0.12 + 0.88 * Math.max(0, -nx * 0.55 - ny * 0.35 + nz * 0.75);
       const luminance = (pixels[si] * .2126 + pixels[si + 1] * .7152 + pixels[si + 2] * .0722) / 255;
-      const tone = Math.min(1, Math.pow(luminance, .72) * (.48 + .68 * light));
+      const tone = Math.min(1, Math.pow(luminance, 1.1) * (.25 + .9 * light));
       // Two orange inks, retaining the actual selected planet's surface.
-      const dark = [190, 61, 8], pale = [255, 226, 183];
+      const dark = [90, 22, 0], pale = [255, 156, 50];
       for (let k = 0; k < 3; k++) out.data[j + k] = dark[k] + (pale[k] - dark[k]) * tone;
       out.data[j + 3] = Math.min(255, (1 - d) * 14000);
     }
   bx.putImageData(out, 0, 0);
-  const ink = "#df530c";
+  const ink = "#251005";
   const sans = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
   const text = (t, px, py, size, color = ink, weight = "400", family = sans) => {
     x.fillStyle = color; x.font = `${weight} ${size}px ${family}`; x.fillText(t, px, py);
@@ -483,35 +483,46 @@ async function makePoster() {
     I: [[41,0,41,70]],
     N: [[0,70,0,0,82,70,82,0]]
   };
-  x.save(); x.translate(55, 72); x.scale(1.04, 1.04);
-  x.strokeStyle = ink; x.lineWidth = 12; x.lineJoin = "bevel";
-  let offset = 0;
-  for (const ch of "SPACE LINE") {
-    if (ch === " ") { offset += 35; continue; }
-    for (const points of glyphs[ch]) {
-      x.beginPath(); x.moveTo(offset + points[0], points[1]);
-      for (let i = 2; i < points.length; i += 2) x.lineTo(offset + points[i], points[i + 1]);
-      x.stroke();
-    }
-    offset += 101;
-  }
+  // Oversized cropped planet, with the lower band reserved for personal data and QR.
+  x.save(); x.beginPath(); x.rect(0, 0, 1080, 1350); x.clip();
+  x.drawImage(ball, 170, 330, 1540, 1540);
   x.restore();
-  text("22世紀の宇宙交通", 52, 210, 32);
-  text("2127", 914, 210, 26);
-  x.drawImage(ball, 52, 295, 900, 900);
-  // Fine orbit on the outer margin; kept clear of personal information.
-  x.strokeStyle = "#ea7836"; x.lineWidth = 1.5;
-  x.beginPath(); x.moveTo(998, 254); x.bezierCurveTo(1030, 770, 1018, 1120, 770, 1300); x.stroke();
-  for (const [cx, cy] of [[999,300],[958,1060]]) {
-    x.beginPath(); x.arc(cx,cy,7,0,Math.PI*2); x.fillStyle=ink; x.fill();
+  const wordmark = (word, px, py, sx, sy) => {
+    x.save(); x.translate(px, py); x.scale(sx,sy);
+    x.strokeStyle = ink; x.lineWidth = 16; x.lineJoin = "bevel";
+    let offset = 0;
+    for (const ch of word) {
+      for (const points of glyphs[ch]) {
+        x.beginPath(); x.moveTo(offset + points[0], points[1]);
+        for (let i=2;i<points.length;i+=2) x.lineTo(offset+points[i],points[i+1]);
+        x.stroke();
+      }
+      offset += 105;
+    }
+    x.restore();
+  };
+  wordmark("SPACE", 52, 55, 1.92, 1.48);
+  wordmark("LINE", 52, 202, 1.85, 1.48);
+  text("22世紀の宇宙交通", 36, 376, 42, ink, "700");
+  x.strokeStyle = "#fff0ca"; x.lineWidth = 2;
+  x.beginPath(); x.moveTo(1080,185); x.bezierCurveTo(450,270,-140,1080,70,1280); x.stroke();
+  x.beginPath(); x.arc(452,461,12,0,Math.PI*2); x.fillStyle="#fff0ca"; x.fill();
+  // Heavy destination title bridges the planet and the orange margin.
+  let destinationSize = 176;
+  const destination = r.planetId.toUpperCase();
+  while (destinationSize > 50) {
+    x.font = `900 ${destinationSize}px Arial, sans-serif`;
+    if (x.measureText(destination).width <= 810) break;
+    destinationSize--;
   }
-  fit(names[r.planetId] || r.planetId, 52, 1252, 148, 680);
-  text(r.planetId.toUpperCase().split("").join(" "), 56, 1312, 30);
-  x.fillStyle = "#df530c80"; x.fillRect(52, 1342, 976, 1);
+  text(destination, 28, 1314, destinationSize, "#fff0ca", "900", "Arial, sans-serif");
+  fit(names[r.planetId] || "", 865, 1310, 80, 185, "#fff0ca");
+  x.fillStyle = "#ff7900"; x.fillRect(0,1350,1080,450);
+  x.fillStyle = "#25100555"; x.fillRect(36,1350,1008,2);
   fit(r.username, 52, 1410, 40, 595);
   text(r.ticketId, 54, 1457, 25);
   const details = [profile?.region, profile?.birthday?.replaceAll("-", ".")].filter(Boolean).join("  /  ");
-  if (details) fit(details, 54, 1505, 21, 590, "#a9572d");
+  if (details) fit(details, 54, 1505, 21, 590, ink);
   // Keep user messages inside the left column, including long multi-line input.
   let size = 30, lines;
   do {
@@ -551,12 +562,12 @@ async function makePoster() {
   }
   if (!qr) {
     // Reserved QR zone: unobtrusive corner marks, never a fake scannable code.
-    x.strokeStyle = "#df530c65"; x.lineWidth = 1.5;
+    x.strokeStyle = "#25100580"; x.lineWidth = 1.5;
     for (const [px, py, dx, dy] of [[720,1370,1,1],[990,1370,-1,1],[720,1640,1,-1],[990,1640,-1,-1]]) {
       x.beginPath(); x.moveTo(px + dx * 18, py); x.lineTo(px,py); x.lineTo(px,py + dy * 18); x.stroke();
     }
   }
-  text("2127", 54, 1750, 18);
+  text("2127", 42, 1750, 70, ink, "900", "Arial, sans-serif");
   text("地点 " + r.slotId.split("-")[1], 900, 1750, 18);
   return { url: c.toDataURL("image/png"), hasQR: !!qr };
 }
