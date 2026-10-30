@@ -403,18 +403,10 @@ async function makePoster() {
   const x = c.getContext("2d");
   if (document.fonts?.load) await document.fonts.load('900 110px "Poster Display"');
   if (document.fonts?.ready) await document.fonts.ready;
-  const [art, brand] = await Promise.all([
-    loadImage(`assets/poster-${r.planetId}-approved.jpg`),
-    loadImage("assets/poster-mercury-approved.jpg")
-  ]);
+  const art = await loadImage(`assets/poster-${r.planetId}-approved.jpg`);
   x.fillStyle = "#ff7900"; x.fillRect(0,0,c.width,c.height);
   x.save(); x.beginPath(); x.rect(0,0,1080,1280); x.clip();
   x.drawImage(art,0,0,1080,art.height*1080/art.width); x.restore();
-  // One master wordmark, uniformly scaled across every destination.
-  const brandScale=1080/brand.width;
-  for(const [bx,by,bw,bh] of [[0,0,brand.width,160],[0,160,700,145],[0,295,510,95]]) {
-    x.drawImage(brand,bx,by,bw,bh,bx*brandScale,by*brandScale,bw*brandScale,bh*brandScale);
-  }
   const ink = "#251005", sans = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
   const text = (value,px,py,size,weight="400",family=sans) => {
     x.fillStyle=ink; x.font=`${weight} ${size}px ${family}`; x.fillText(value,px,py);
@@ -424,33 +416,37 @@ async function makePoster() {
     text(value,px,py,size);
   };
   const display = '"Poster Display", Arial, sans-serif';
-  let titleSize=160;
+  let titleSize=190;
   while(titleSize>50){
     x.font=`900 ${titleSize}px ${display}`;
     if(x.measureText(r.planetId.toUpperCase()).width<=1004)break;
     titleSize--;
   }
   x.font=`900 ${titleSize}px ${display}`;x.fillStyle="#fff0ca";
-  x.fillText(r.planetId.toUpperCase(),38,1450);
-  x.font=`700 52px ${sans}`;x.fillText(names[r.planetId],40,1530);
-  text("2127",38,1695,57,"900",display);
-  fit(r.username,325,1655,34,365);
-  text(r.ticketId,325,1695,24,"600",display);
-  text(`${names[r.planetId]} · 地点 ${r.slotId.split("-").at(-1)}`,38,1750,28,"600");
+  x.fillText(r.planetId.toUpperCase(),38,1470);
+  x.font=`700 46px ${sans}`;x.fillText(names[r.planetId],40,1530);
+  text("2127",884,1530,32,"600",display);
+  // A clear reading order: name, selected spot, serial, optional details, message.
+  let nameSize=64;
+  while(nameSize>30){x.font=`600 ${nameSize}px ${sans}`;if(x.measureText(r.username).width<=1004)break;nameSize--;}
+  text(r.username,38,1618,nameSize,"600");
+  text(`地点 ${r.slotId.split("-").at(-1)}`,38,1680,44,"600");
+  text(r.ticketId,38,1730,32,"600",display);
   const details=[profile?.region,profile?.birthday?.replaceAll("-",".")].filter(Boolean).join(" / ");
-  if(details)fit(details,38,1792,20,650);
-  let size=28, lines;
+  if(details)fit(details,38,1778,30,630);
+  let size=44, lines;
   do {
     lines=[];let line="";x.font=`400 ${size}px ${sans}`;
     for(const ch of (r.message||"").replace(/\n+/g," ")){
-      if(x.measureText(line+ch).width>650&&line){lines.push(line);line="";}
+      if(x.measureText(line+ch).width>630&&line){lines.push(line);line="";}
       line+=ch;
     }
     if(line)lines.push(line);
-    if(lines.length*size*1.4<=124||size<=18)break;
+    const shortMessage = [...(r.message||"")].length<=24;
+    if((lines.length*size*1.35<=150 && (!shortMessage || lines.length<=1))||size<=24)break;
     size--;
   }while(true);
-  lines.forEach((line,i)=>text(line,38,1840+i*size*1.4,size));
+  lines.forEach((line,i)=>text(line,38,1840+i*size*1.35,size));
   const qrX=720,qrY=1650;
   const payload = {
     version: 1,
@@ -473,7 +469,12 @@ async function makePoster() {
       x.imageSmoothingEnabled=true;
     }
   }catch(err){console.error(err);qr=null;}
-  if(!qr){x.fillStyle="#fff0ca";x.fillRect(qrX,qrY,270,270);}
+  if(!qr){
+    x.strokeStyle="#25100566";x.lineWidth=2;
+    for(const [px,py,dx,dy] of [[qrX,qrY,1,1],[qrX+270,qrY,-1,1],[qrX,qrY+270,1,-1],[qrX+270,qrY+270,-1,-1]]){
+      x.beginPath();x.moveTo(px+dx*20,py);x.lineTo(px,py);x.lineTo(px,py+dy*20);x.stroke();
+    }
+  }
   return {url:c.toDataURL("image/png"),hasQR:!!qr};
 }
 async function showPoster() {
