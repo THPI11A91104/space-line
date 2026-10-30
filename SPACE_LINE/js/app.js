@@ -399,55 +399,69 @@ const loadImage = (src) =>
 async function makePoster() {
   const r = myRecord;
   if (!names[r.planetId]) throw Error("Unknown poster destination");
-  const c = document.createElement("canvas"); c.width = 1080; c.height = 1980;
-  const x = c.getContext("2d");
-  if (document.fonts?.load) await document.fonts.load('900 110px "Poster Display"');
-  if (document.fonts?.ready) await document.fonts.ready;
-  const art = await loadImage(`assets/poster-${r.planetId}-approved.jpg`);
-  x.fillStyle = "#ff7900"; x.fillRect(0,0,c.width,c.height);
-  x.save(); x.beginPath(); x.rect(0,0,1080,1280); x.clip();
-  x.drawImage(art,0,0,1080,art.height*1080/art.width); x.restore();
-  const ink = "#251005", sans = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
-  const text = (value,px,py,size,weight="400",family=sans) => {
-    x.fillStyle=ink; x.font=`${weight} ${size}px ${family}`; x.fillText(value,px,py);
+  const c = document.createElement("canvas"); c.width=1080; c.height=1980;
+  const x=c.getContext("2d");
+  if(document.fonts?.ready)await document.fonts.ready;
+  const art=await loadImage(`assets/poster-${r.planetId}-approved.jpg`);
+  const orange="#ff7900", ink="#291307", paper="#fff0d8";
+  // Apart from the brand artwork, all text uses one sans-serif family.
+  const family='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif';
+  const font=(size,weight=400)=>{x.font=`${weight} ${size}px ${family}`;};
+  const text=(value,px,py,size,weight=400,color=ink)=>{
+    font(size,weight);x.fillStyle=color;x.fillText(value,px,py);
   };
-  const fit = (value,px,py,size,width) => {
-    while(size>16){x.font=`400 ${size}px ${sans}`;if(x.measureText(value).width<=width)break;size--;}
-    text(value,px,py,size);
-  };
-  const display = '"Poster Display", Arial, sans-serif';
-  let titleSize=190;
-  while(titleSize>50){
-    x.font=`900 ${titleSize}px ${display}`;
-    if(x.measureText(r.planetId.toUpperCase()).width<=1004)break;
-    titleSize--;
-  }
-  x.font=`900 ${titleSize}px ${display}`;x.fillStyle="#fff0ca";
-  x.fillText(r.planetId.toUpperCase(),38,1470);
-  x.font=`700 46px ${sans}`;x.fillText(names[r.planetId],40,1530);
-  text("2127",884,1530,32,"600",display);
-  // A clear reading order: name, selected spot, serial, optional details, message.
-  let nameSize=64;
-  while(nameSize>30){x.font=`600 ${nameSize}px ${sans}`;if(x.measureText(r.username).width<=1004)break;nameSize--;}
-  text(r.username,38,1618,nameSize,"600");
-  text(`地点 ${r.slotId.split("-").at(-1)}`,38,1680,44,"600");
-  text(r.ticketId,38,1730,32,"600",display);
-  const details=[profile?.region,profile?.birthday?.replaceAll("-",".")].filter(Boolean).join(" / ");
-  if(details)fit(details,38,1778,30,630);
-  let size=44, lines;
-  do {
-    lines=[];let line="";x.font=`400 ${size}px ${sans}`;
-    for(const ch of (r.message||"").replace(/\n+/g," ")){
-      if(x.measureText(line+ch).width>630&&line){lines.push(line);line="";}
+  const graphemes=value=>typeof Intl.Segmenter==="function"
+    ? [...new Intl.Segmenter("ja",{granularity:"grapheme"}).segment(value)].map(v=>v.segment)
+    : Array.from(value);
+  const wrap=(value,width,size,weight=400)=>{
+    font(size,weight);const lines=[];let line="";
+    for(const ch of graphemes(value)){
+      if(ch==="\n"){lines.push(line);line="";continue;}
+      if(line && x.measureText(line+ch).width>width){
+        // Japanese punctuation stays with the preceding phrase.
+        if(/^[、。，．！？!?：:；;）)」』】〉》]$/.test(ch)){
+          const parts=graphemes(line);const tail=parts.pop();
+          lines.push(parts.join(""));line=tail+ch;continue;
+        }
+        const parts=graphemes(line);
+        if(/[（(「『【〈《]$/.test(line)){const tail=parts.pop();lines.push(parts.join(""));line=tail;}
+        else{lines.push(line);line="";}
+      }
       line+=ch;
     }
     if(line)lines.push(line);
-    const shortMessage = [...(r.message||"")].length<=24;
-    if((lines.length*size*1.35<=150 && (!shortMessage || lines.length<=1))||size<=24)break;
-    size--;
+    return lines;
+  };
+  x.fillStyle=orange;x.fillRect(0,0,1080,1980);
+  x.save();x.beginPath();x.rect(0,0,1080,1080);x.clip();
+  x.drawImage(art,0,0,1080,art.height*1080/art.width);x.restore();
+  // Shared grid: destination, full-width message, then identity + QR.
+  text(names[r.planetId],64,1186,84,700,paper);
+  text(r.planetId.toUpperCase(),66,1240,32,600,paper);
+  x.textAlign="right";
+  text(`地点 ${r.slotId.split("-").at(-1)}`,1016,1180,42,600,paper);
+  text("2127",1016,1240,32,600,paper);
+  x.textAlign="left";
+  let message=(r.message||"").trim().replace(/\n{3,}/g,"\n\n");
+  if(message.split("\n").length>4)message=message.replace(/\n+/g," ");
+  let messageSize=message.length<=18?64:54, messageLines;
+  do{
+    messageLines=wrap(message,952,messageSize,500);
+    if(messageLines.length*messageSize*1.4<=282||messageSize<=30)break;
+    messageSize--;
   }while(true);
-  lines.forEach((line,i)=>text(line,38,1840+i*size*1.35,size));
-  const qrX=720,qrY=1650;
+  messageLines.forEach((line,i)=>text(line,64,1345+i*messageSize*1.4,messageSize,500));
+  x.fillStyle="#29130755";x.fillRect(64,1640,952,2);
+  let nameSize=52,nameLines;
+  do{nameLines=wrap(r.username,590,nameSize,700);if(nameLines.length<=2||nameSize<=30)break;nameSize--;}while(true);
+  nameLines.forEach((line,i)=>text(line,64,1716+i*nameSize*1.25,nameSize,700));
+  const metaY=nameLines.length>1?1840:1796;
+  text(r.ticketId,64,metaY,30,500);
+  const details=[profile?.region,profile?.birthday?.replaceAll("-",".")].filter(Boolean).join(" / ");
+  let detailSize=30,detailLines;
+  do{detailLines=wrap(details,590,detailSize);if(detailLines.length<=2||detailSize<=22)break;detailSize--;}while(true);
+  detailLines.forEach((line,i)=>text(line,64,metaY+48+i*detailSize*1.3,detailSize));
+  const qrX=736,qrY=1680;
   const payload = {
     version: 1,
     id: r.id,
@@ -458,23 +472,15 @@ async function makePoster() {
     message: r.message,
   };
   let qr=null;
-  try {
+  try{
     qr=await window.SpaceLineQR.generate(payload);
     if(qr&&!/^data:image\/png;base64,/.test(qr))throw Error("QR must be PNG");
-    if(qr){
-      const qrImage=await loadImage(qr);
-      x.fillStyle="#fff";x.fillRect(qrX-10,qrY-10,290,290);
-      x.imageSmoothingEnabled=false;
-      x.drawImage(qrImage,qrX,qrY,270,270);
-      x.imageSmoothingEnabled=true;
-    }
+    if(qr){const img=await loadImage(qr);x.fillStyle="#fff";x.fillRect(qrX-10,qrY-10,290,290);
+      x.imageSmoothingEnabled=false;x.drawImage(img,qrX,qrY,270,270);x.imageSmoothingEnabled=true;}
   }catch(err){console.error(err);qr=null;}
-  if(!qr){
-    x.strokeStyle="#25100566";x.lineWidth=2;
+  if(!qr){x.strokeStyle="#29130755";x.lineWidth=2;
     for(const [px,py,dx,dy] of [[qrX,qrY,1,1],[qrX+270,qrY,-1,1],[qrX,qrY+270,1,-1],[qrX+270,qrY+270,-1,-1]]){
-      x.beginPath();x.moveTo(px+dx*20,py);x.lineTo(px,py);x.lineTo(px,py+dy*20);x.stroke();
-    }
-  }
+      x.beginPath();x.moveTo(px+dx*18,py);x.lineTo(px,py);x.lineTo(px,py+dy*18);x.stroke();}}
   return {url:c.toDataURL("image/png"),hasQR:!!qr};
 }
 async function showPoster() {
