@@ -407,3 +407,19 @@ dialog { background: #27150c; border: 1px solid #ff8b3d40; border-radius: 24px; 
 .credits-footer a { color: #b18b70; font-size: 10px; }
 .credits-footer a:hover,.credits-footer a:focus-visible { color: #ffbe92; }
 @media(max-width:600px) { .panel.poster { padding: 12px; } }
+
+/* Native dropdowns need an opaque surface on Windows and iOS. */
+.birthday-fields select { color-scheme: light; background: #ffead9; color: #351a0c; border-color: #e8b897; }
+.birthday-fields select option { background: #ffead9; color: #351a0c; }
+input:autofill { color: #351a0c; }
+input:-webkit-autofill { -webkit-text-fill-color: #fff1e5; -webkit-box-shadow: 0 0 0 1000px #321e10 inset; }
+.panel.poster .poster-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.poster-actions > * { display: flex; align-items: center; justify-content: center; min-height: 50px; margin: 0; padding: 12px 8px; font-size: 13px; line-height: 1.4; border-radius: 12px; text-align: center; }
+.poster-actions #download { grid-column: 1 / -1; }
+.poster-actions #next-person { grid-column: 1 / -1; background: transparent; color: #d9aa88; border-color: transparent; }
+#guide { display: flex; flex-wrap: wrap; gap: 8px; max-width: 600px; margin: 0 auto; }
+#guide p { flex: 0 0 100%; margin: 0 0 4px; }
+#guide button { flex: 1 1 110px; min-height: 44px; margin: 0; text-align: center; }
+
+body[data-view="form"] .brand-heading { font-family: Arial, sans-serif; font-size: clamp(30px, 8vw, 40px); font-weight: 500; letter-spacing: .11em; margin-bottom: 8px; color: #fff1e5; white-space: nowrap; }
+.brand-subtitle { font-size: 13px; letter-spacing: .24em; color: #ffad76; margin: 0 0 30px; }
