@@ -397,146 +397,61 @@ const loadImage = (src) =>
 
 // 海報内のQR生成だけを王さんの実装に差し替えられます。
 async function makePoster() {
-  const r = myRecord,
-    c = document.createElement("canvas");
-  c.width = 1080;
-  c.height = 1800;
+  const r = myRecord;
+  if (!names[r.planetId]) throw Error("Unknown poster destination");
+  const c = document.createElement("canvas"); c.width = 1080; c.height = 1980;
   const x = c.getContext("2d");
+  if (document.fonts?.load) await document.fonts.load('900 110px "Poster Display"');
   if (document.fonts?.ready) await document.fonts.ready;
-  x.fillStyle = "#ff7900";
-  x.fillRect(0, 0, 1080, 1800);
-  // 選んだ惑星のテクスチャを球面に投影して、立体的な主役を描きます。
-  const texture = await loadImage(
-    `textures/${r.planetId}/${r.planetId === "earth" ? "earth_day" : r.planetId}.webp`,
-  );
-  const tc = document.createElement("canvas");
-  tc.width = texture.width;
-  tc.height = texture.height;
-  const tx = tc.getContext("2d");
-  tx.drawImage(texture, 0, 0); // 地球の雲を同じ球面に合成します。
-  if (r.planetId === "earth") {
-    const clouds = await loadImage("textures/earth/earth_clouds.webp");
-    const cc = document.createElement("canvas");
-    cc.width = tc.width;
-    cc.height = tc.height;
-    const cx = cc.getContext("2d");
-    cx.drawImage(clouds, 0, 0, cc.width, cc.height);
-    const cd = cx.getImageData(0, 0, cc.width, cc.height);
-    for (let i = 0; i < cd.data.length; i += 4) {
-      const alpha = cd.data[i];
-      cd.data[i] = cd.data[i + 1] = cd.data[i + 2] = 255;
-      cd.data[i + 3] = alpha * 0.82;
-    }
-    cx.putImageData(cd, 0, 0);
-    tx.drawImage(cc, 0, 0);
+  const [art, brand] = await Promise.all([
+    loadImage(`assets/poster-${r.planetId}-approved.jpg`),
+    loadImage("assets/poster-mercury-approved.jpg")
+  ]);
+  x.fillStyle = "#ff7900"; x.fillRect(0,0,c.width,c.height);
+  x.save(); x.beginPath(); x.rect(0,0,1080,1280); x.clip();
+  x.drawImage(art,0,0,1080,art.height*1080/art.width); x.restore();
+  // One master wordmark, uniformly scaled across every destination.
+  const brandScale=1080/brand.width;
+  for(const [bx,by,bw,bh] of [[0,0,brand.width,160],[0,160,700,145],[0,295,510,95]]) {
+    x.drawImage(brand,bx,by,bw,bh,bx*brandScale,by*brandScale,bw*brandScale,bh*brandScale);
   }
-  const pixels = tx.getImageData(0, 0, tc.width, tc.height).data;
-  const ball = document.createElement("canvas");
-  ball.width = ball.height = 760;
-  const bx = ball.getContext("2d"),
-    out = bx.createImageData(760, 760);
-  for (let py = 0; py < 760; py++)
-    for (let px = 0; px < 760; px++) {
-      const nx = (px - 380) / 374,
-        ny = (py - 380) / 374,
-        d = nx * nx + ny * ny;
-      if (d > 1) continue;
-      const nz = Math.sqrt(1 - d);
-      const u = Math.atan2(nx, nz) / (Math.PI * 2) + 0.5,
-        v = Math.acos(-ny) / Math.PI;
-      const si =
-        (Math.min(tc.height - 1, Math.floor(v * tc.height)) * tc.width +
-          Math.floor(u * tc.width)) *
-        4;
-      const j = (py * 760 + px) * 4;
-      const light =
-        0.12 + 0.88 * Math.max(0, -nx * 0.55 - ny * 0.35 + nz * 0.75);
-      const luminance = (pixels[si] * .2126 + pixels[si + 1] * .7152 + pixels[si + 2] * .0722) / 255;
-      const tone = Math.min(1, Math.pow(luminance, 1.1) * (.25 + .9 * light));
-      // Two orange inks, retaining the actual selected planet's surface.
-      const dark = [90, 22, 0], pale = [255, 156, 50];
-      for (let k = 0; k < 3; k++) out.data[j + k] = dark[k] + (pale[k] - dark[k]) * tone;
-      out.data[j + 3] = Math.min(255, (1 - d) * 14000);
-    }
-  bx.putImageData(out, 0, 0);
-  const ink = "#251005";
-  const sans = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
-  const text = (t, px, py, size, color = ink, weight = "400", family = sans) => {
-    x.fillStyle = color; x.font = `${weight} ${size}px ${family}`; x.fillText(t, px, py);
+  const ink = "#251005", sans = '"Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif';
+  const text = (value,px,py,size,weight="400",family=sans) => {
+    x.fillStyle=ink; x.font=`${weight} ${size}px ${family}`; x.fillText(value,px,py);
   };
-  const fit = (t, px, py, size, width, color = ink, family = sans) => {
-    while (size > 16) {
-      x.font = `400 ${size}px ${family}`;
-      if (x.measureText(t).width <= width) break;
-      size--;
-    }
-    text(t, px, py, size, color, "400", family);
+  const fit = (value,px,py,size,width) => {
+    while(size>16){x.font=`400 ${size}px ${sans}`;if(x.measureText(value).width<=width)break;size--;}
+    text(value,px,py,size);
   };
-  // A deterministic geometric wordmark: no dependency on installed Latin fonts.
-  const glyphs = {
-    S: [[82,0,12,0,0,12,0,23,12,35,70,35,82,47,82,58,70,70,0,70]],
-    P: [[0,70,0,0,70,0,82,12,82,23,70,35,0,35]],
-    A: [[0,70,41,0,82,70]],
-    C: [[82,0,12,0,0,12,0,58,12,70,82,70]],
-    E: [[82,0,0,0,0,70,82,70],[0,35,68,35]],
-    L: [[0,0,0,70,82,70]],
-    I: [[41,0,41,70]],
-    N: [[0,70,0,0,82,70,82,0]]
-  };
-  // Oversized cropped planet, with the lower band reserved for personal data and QR.
-  x.save(); x.beginPath(); x.rect(0, 0, 1080, 1350); x.clip();
-  x.drawImage(ball, 170, 330, 1540, 1540);
-  x.restore();
-  const wordmark = (word, px, py, sx, sy) => {
-    x.save(); x.translate(px, py); x.scale(sx,sy);
-    x.strokeStyle = ink; x.lineWidth = 16; x.lineJoin = "bevel";
-    let offset = 0;
-    for (const ch of word) {
-      for (const points of glyphs[ch]) {
-        x.beginPath(); x.moveTo(offset + points[0], points[1]);
-        for (let i=2;i<points.length;i+=2) x.lineTo(offset+points[i],points[i+1]);
-        x.stroke();
-      }
-      offset += 105;
-    }
-    x.restore();
-  };
-  wordmark("SPACE", 52, 55, 1.92, 1.48);
-  wordmark("LINE", 52, 202, 1.85, 1.48);
-  text("22世紀の宇宙交通", 36, 376, 42, ink, "700");
-  x.strokeStyle = "#fff0ca"; x.lineWidth = 2;
-  x.beginPath(); x.moveTo(1080,185); x.bezierCurveTo(450,270,-140,1080,70,1280); x.stroke();
-  x.beginPath(); x.arc(452,461,12,0,Math.PI*2); x.fillStyle="#fff0ca"; x.fill();
-  // Heavy destination title bridges the planet and the orange margin.
-  let destinationSize = 176;
-  const destination = r.planetId.toUpperCase();
-  while (destinationSize > 50) {
-    x.font = `900 ${destinationSize}px Arial, sans-serif`;
-    if (x.measureText(destination).width <= 810) break;
-    destinationSize--;
+  const display = '"Poster Display", Arial, sans-serif';
+  let titleSize=160;
+  while(titleSize>50){
+    x.font=`900 ${titleSize}px ${display}`;
+    if(x.measureText(r.planetId.toUpperCase()).width<=1004)break;
+    titleSize--;
   }
-  text(destination, 28, 1314, destinationSize, "#fff0ca", "900", "Arial, sans-serif");
-  fit(names[r.planetId] || "", 865, 1310, 80, 185, "#fff0ca");
-  x.fillStyle = "#ff7900"; x.fillRect(0,1350,1080,450);
-  x.fillStyle = "#25100555"; x.fillRect(36,1350,1008,2);
-  fit(r.username, 52, 1410, 40, 595);
-  text(r.ticketId, 54, 1457, 25);
-  const details = [profile?.region, profile?.birthday?.replaceAll("-", ".")].filter(Boolean).join("  /  ");
-  if (details) fit(details, 54, 1505, 21, 590, ink);
-  // Keep user messages inside the left column, including long multi-line input.
-  let size = 30, lines;
+  x.font=`900 ${titleSize}px ${display}`;x.fillStyle="#fff0ca";
+  x.fillText(r.planetId.toUpperCase(),38,1450);
+  x.font=`700 52px ${sans}`;x.fillText(names[r.planetId],40,1530);
+  text("2127",38,1695,57,"900",display);
+  fit(r.username,325,1655,34,365);
+  text(r.ticketId,325,1695,24,"600",display);
+  text(`${names[r.planetId]} · 地点 ${r.slotId.split("-").at(-1)}`,38,1750,28,"600");
+  const details=[profile?.region,profile?.birthday?.replaceAll("-",".")].filter(Boolean).join(" / ");
+  if(details)fit(details,38,1792,20,650);
+  let size=28, lines;
   do {
-    lines = []; let line = "";
-    x.font = `400 ${size}px ${sans}`;
-    for (const ch of (r.message || "").replace(/\n+/g, " ")) {
-      if (x.measureText(line + ch).width > 590 && line) { lines.push(line); line = ""; }
-      line += ch;
+    lines=[];let line="";x.font=`400 ${size}px ${sans}`;
+    for(const ch of (r.message||"").replace(/\n+/g," ")){
+      if(x.measureText(line+ch).width>650&&line){lines.push(line);line="";}
+      line+=ch;
     }
-    if (line) lines.push(line);
-    if (lines.length * size * 1.5 <= 170 || size <= 18) break;
+    if(line)lines.push(line);
+    if(lines.length*size*1.4<=124||size<=18)break;
     size--;
-  } while (true);
-  lines.forEach((line, i) => text(line, 54, 1570 + i * size * 1.5, size));
+  }while(true);
+  lines.forEach((line,i)=>text(line,38,1840+i*size*1.4,size));
+  const qrX=720,qrY=1650;
   const payload = {
     version: 1,
     id: r.id,
@@ -546,30 +461,20 @@ async function makePoster() {
     checkin: { planetId: r.planetId, spotId: r.slotId },
     message: r.message,
   };
-  let qr = null;
+  let qr=null;
   try {
-    qr = await window.SpaceLineQR.generate(payload);
-    if (qr && !/^data:image\/png;base64,/.test(qr))
-      throw Error("QR must be PNG");
-    if (qr) {
-      x.fillStyle = "#fff";
-      x.fillRect(710, 1360, 290, 290);
-      x.drawImage(await loadImage(qr), 720, 1370, 270, 270);
+    qr=await window.SpaceLineQR.generate(payload);
+    if(qr&&!/^data:image\/png;base64,/.test(qr))throw Error("QR must be PNG");
+    if(qr){
+      const qrImage=await loadImage(qr);
+      x.fillStyle="#fff";x.fillRect(qrX-10,qrY-10,290,290);
+      x.imageSmoothingEnabled=false;
+      x.drawImage(qrImage,qrX,qrY,270,270);
+      x.imageSmoothingEnabled=true;
     }
-  } catch (err) {
-    console.error(err);
-    qr = null;
-  }
-  if (!qr) {
-    // Reserved QR zone: unobtrusive corner marks, never a fake scannable code.
-    x.strokeStyle = "#25100580"; x.lineWidth = 1.5;
-    for (const [px, py, dx, dy] of [[720,1370,1,1],[990,1370,-1,1],[720,1640,1,-1],[990,1640,-1,-1]]) {
-      x.beginPath(); x.moveTo(px + dx * 18, py); x.lineTo(px,py); x.lineTo(px,py + dy * 18); x.stroke();
-    }
-  }
-  text("2127", 42, 1750, 70, ink, "900", "Arial, sans-serif");
-  text("地点 " + r.slotId.split("-")[1], 900, 1750, 18);
-  return { url: c.toDataURL("image/png"), hasQR: !!qr };
+  }catch(err){console.error(err);qr=null;}
+  if(!qr){x.fillStyle="#fff0ca";x.fillRect(qrX,qrY,270,270);}
+  return {url:c.toDataURL("image/png"),hasQR:!!qr};
 }
 async function showPoster() {
   if (!myRecord) return;
