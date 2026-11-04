@@ -66,7 +66,7 @@ async function connect() {
     } catch {
       records = [];
     }
-    $("mode").textContent = "この端末だけのデモ";
+    $("mode").textContent = "";
     window.addEventListener("storage", () => {
       try {
         records = JSON.parse(localStorage.getItem(key + "-records")) || [];
@@ -226,10 +226,10 @@ function registration() {
   <label for="region">出発地（任意）</label><input id="region" maxlength="30" placeholder="例：東京 / 成都">
   <p class="hint">ニックネーム・アバター・メッセージは公開されます。</p>
   <div class="actions"><button id="start" class="primary">星を選ぶ</button></div></form>
-  <footer class="credits-footer"><a href="credits.html" target="_blank" rel="noopener">クレジット</a></footer>`;
+  `;
   if (myRecord) {
     $("panel").innerHTML =
-      `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">作成済みのポスターを見る</button><button id="resume-space">みんなの宇宙を見る</button><button id="new-person">新しい参加者として始める</button></div><footer class="credits-footer"><a href="credits.html" target="_blank" rel="noopener">クレジット</a></footer>`;
+      `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">作成済みのポスターを見る</button><button id="resume-space">みんなの宇宙を見る</button><button id="new-person">新しい参加者として始める</button></div>`;
     $("resume-poster").onclick = showPoster;
     $("resume-space").onclick = () => explore(true);
     $("new-person").onclick = confirmNewParticipant;
