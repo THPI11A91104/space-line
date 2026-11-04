@@ -214,15 +214,6 @@ function registration() {
     `<h1 class="brand-heading">SPACE LINE</h1><p class="brand-subtitle">22世紀の宇宙交通</p>
   <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="20" placeholder="例：そら" autocomplete="nickname">
   <label>アバター *</label><div class="avatars">${[1, 2, 3, 4].map((i) => `<label><img src="assets/avatar-${i}.svg" alt="宇宙飛行士 ${i}"><input type="radio" name="avatar" value="${i}" ${i === (profile?.avatarId || 1) ? "checked" : ""}></label>`).join("")}</div>
-  <label id="birthday-label">生年月日（任意）</label><div class="birthday-fields" role="group" aria-labelledby="birthday-label"><select id="birth-year" aria-label="年"><option value="">年</option>${Array.from(
-    { length: 121 },
-    (_, i) => new Date().getFullYear() - i,
-  )
-    .map((year) => `<option value="${year}">${year}年</option>`)
-    .join(
-      "",
-    )}</select><select id="birth-month" aria-label="月"><option value="">月</option>${Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}月</option>`).join("")}</select><select id="birth-day" aria-label="日"><option value="">日</option></select></div><p id="birth-error" class="error" role="alert"></p>
-  <p class="hint">生年月日は公開されません。</p>
   <label for="region">出発地（任意）</label><input id="region" maxlength="30" placeholder="例：東京 / 成都">
   <p class="hint">ニックネーム・アバター・メッセージは公開されます。</p>
   <div class="actions"><button id="start" class="primary">星を選ぶ</button></div></form>
@@ -236,52 +227,14 @@ function registration() {
     return;
   }
   $("nickname").value = profile?.username || "";
-  const birthdayParts = (profile?.birthday || "").split("-");
-  $("birth-year").value = birthdayParts[0] || "";
-  $("birth-month").value = birthdayParts[1] ? Number(birthdayParts[1]) : "";
-  const updateDays = () => {
-    const current = $("birth-day").value;
-    const year = Number($("birth-year").value) || 2000;
-    const month = Number($("birth-month").value) || 1;
-    const total = new Date(year, month, 0).getDate();
-    $("birth-day").innerHTML =
-      '<option value="">日</option>' +
-      Array.from(
-        { length: total },
-        (_, i) => `<option value="${i + 1}">${i + 1}日</option>`,
-      ).join("");
-    $("birth-day").value = Number(current) <= total ? current : "";
-  };
-  $("birth-year").onchange = updateDays;
-  $("birth-month").onchange = updateDays;
-  updateDays();
-  $("birth-day").value = birthdayParts[2] ? Number(birthdayParts[2]) : "";
   $("region").value = profile?.region || "";
   $("form").onsubmit = (e) => {
     e.preventDefault();
     const username = $("nickname").value.trim();
     if (!username) return;
-    const parts = [
-      $("birth-year").value,
-      $("birth-month").value,
-      $("birth-day").value,
-    ];
-    if (parts.some(Boolean) && !parts.every(Boolean)) {
-      $("birth-error").textContent =
-        "年・月・日をすべて選ぶか、すべて空欄にしてください。";
-      return;
-    }
-    const birthday = parts.every(Boolean)
-      ? parts.map((v, i) => (i ? v.padStart(2, "0") : v)).join("-")
-      : "";
-    if (birthday && new Date(birthday + "T00:00:00") > new Date()) {
-      $("birth-error").textContent = "生年月日を確認してください。";
-      return;
-    }
     profile = {
       username,
       avatarId: Number(new FormData(e.target).get("avatar")),
-      birthday,
       region: $("region").value.trim(),
     };
     sessionStorage.setItem(key + "-profile", JSON.stringify(profile));
@@ -455,7 +408,7 @@ async function makePoster() {
   nameLines.forEach((line,i)=>text(line,64,1716+i*nameSize*1.25,nameSize,700));
   const metaY=nameLines.length>1?1840:1796;
   text(r.ticketId,64,metaY,30,500);
-  const details=[profile?.region,profile?.birthday?.replaceAll("-",".")].filter(Boolean).join(" / ");
+  const details=profile?.region || "";
   let detailSize=30,detailLines;
   do{detailLines=wrap(details,590,detailSize);if(detailLines.length<=2||detailSize<=22)break;detailSize--;}while(true);
   detailLines.forEach((line,i)=>text(line,64,metaY+48+i*detailSize*1.3,detailSize));
