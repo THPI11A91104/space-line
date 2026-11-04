@@ -46,7 +46,7 @@ function message(text) {
   $("dialog").showModal();
 }
 
-// 共通サーバーがない場合は、明示したローカルデモとして動作します。
+// APIに接続できなければローカル保存を使う。
 async function connect() {
   try {
     const response = await fetch("./api/state", {
@@ -145,7 +145,7 @@ $("routes").onclick = () => {
   if (show) window.SpaceSolar?.overview();
 };
 $("my-poster").onclick = () => showPoster();
-// 入力が終わってから3Dを読み込み、スマホの初期負荷を抑えます。
+// 3Dはフォーム送信後に読み込む。
 let solarLoading;
 function setView(view) {
   document.body.dataset.view = view;
@@ -186,7 +186,7 @@ async function explore(overview = true) {
   }
 }
 $("back-form").onclick = registration;
-// 過去の記録を残したまま、新しい参加者の受付を始めます。
+// 記録を残して次の参加者に切り替える。
 function newParticipant() {
   clientId = uuid();
   localStorage.setItem(key + "-client", clientId);
@@ -395,7 +395,7 @@ const loadImage = (src) =>
     img.src = src;
   });
 
-// 海報内のQR生成だけを王さんの実装に差し替えられます。
+// 記念ポスターの生成。
 async function makePoster() {
   const r = myRecord;
   if (!names[r.planetId]) throw Error("Unknown poster destination");
@@ -404,7 +404,6 @@ async function makePoster() {
   if(document.fonts?.ready)await document.fonts.ready;
   const art=await loadImage(`assets/poster-${r.planetId}-approved.jpg`);
   const orange="#ff7900", ink="#291307", paper="#fff0d8";
-  // Apart from the brand artwork, all text uses one sans-serif family.
   const family='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif';
   const font=(size,weight=400)=>{x.font=`${weight} ${size}px ${family}`;};
   const text=(value,px,py,size,weight=400,color=ink)=>{
@@ -418,7 +417,7 @@ async function makePoster() {
     for(const ch of graphemes(value)){
       if(ch==="\n"){lines.push(line);line="";continue;}
       if(line && x.measureText(line+ch).width>width){
-        // Japanese punctuation stays with the preceding phrase.
+        // 行頭の句読点を避ける。
         if(/^[、。，．！？!?：:；;）)」』】〉》]$/.test(ch)){
           const parts=graphemes(line);const tail=parts.pop();
           lines.push(parts.join(""));line=tail+ch;continue;
@@ -435,7 +434,6 @@ async function makePoster() {
   x.fillStyle=orange;x.fillRect(0,0,1080,1980);
   x.save();x.beginPath();x.rect(0,0,1080,1080);x.clip();
   x.drawImage(art,0,0,1080,art.height*1080/art.width);x.restore();
-  // Shared grid: destination, full-width message, then identity + QR.
   text(names[r.planetId],64,1186,84,700,paper);
   text(r.planetId.toUpperCase(),66,1240,32,600,paper);
   x.textAlign="right";
