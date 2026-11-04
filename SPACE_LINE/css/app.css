@@ -220,7 +220,7 @@ a {
   }
 }
 
-/* フォームとポスターはスマホでも自然に縦スクロールできます。 */
+/* フォーム画面のスクロール */
 [hidden] {
   display: none !important;
 }
@@ -293,7 +293,7 @@ body[data-view="form"] > canvas {
   display: none;
 }
 
-/* 年月日を直接選べる、コンパクトな入力欄。 */
+/* 生年月日 */
 .birthday-fields {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr;
@@ -344,7 +344,7 @@ body[data-view="form"] > canvas {
   color: #381c09;
 }
 
-/* ホーム画面の控えめなクレジット入口 */
+/* クレジット */
 .credits-footer {
   margin: 30px 0 0;
   text-align: right;
@@ -364,7 +364,7 @@ body[data-view="form"] > canvas {
   text-decoration: underline;
 }
 
-/* ORANGE / 2127 — mobile-first visual system */
+/* オレンジテーマ */
 body { color: #fff3eb; }
 body[data-view="form"] {
  background: radial-gradient(ellipse at 100% 0%, #70320f 0%, #261309 42%, #160e09 85%);
@@ -408,7 +408,7 @@ dialog { background: #27150c; border: 1px solid #ff8b3d40; border-radius: 24px; 
 .credits-footer a:hover,.credits-footer a:focus-visible { color: #ffbe92; }
 @media(max-width:600px) { .panel.poster { padding: 12px; } }
 
-/* Native dropdowns need an opaque surface on Windows and iOS. */
+/* 選択肢の背景色と文字色 */
 .birthday-fields select { color-scheme: light; background: #ffead9; color: #351a0c; border-color: #e8b897; }
 .birthday-fields select option { background: #ffead9; color: #351a0c; }
 input:autofill { color: #351a0c; }
