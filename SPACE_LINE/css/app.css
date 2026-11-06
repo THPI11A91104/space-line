@@ -424,3 +424,41 @@ input:-webkit-autofill { -webkit-text-fill-color: #fff1e5; -webkit-box-shadow: 0
 body[data-view="form"] .brand-heading { font-family: Arial, sans-serif; font-size: clamp(30px, 8vw, 40px); font-weight: 500; letter-spacing: .11em; margin-bottom: 8px; color: #fff1e5; white-space: nowrap; }
 .brand-subtitle { font-size: 13px; letter-spacing: .24em; color: #ffad76; margin: 0 0 30px; }
 
+
+/* ページ全体のスクロールと端末の安全領域 */
+html {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+body[data-view="space"] {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+body[data-view="form"] {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: visible;
+  touch-action: auto;
+}
+body[data-view="form"] .panel,
+body[data-view="form"] .panel.poster {
+  margin-top: calc(82px + env(safe-area-inset-top, 0px));
+  margin-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  min-width: 0;
+}
+.poster-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+.poster-actions {
+  min-width: 0;
+}
+.poster-actions > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
