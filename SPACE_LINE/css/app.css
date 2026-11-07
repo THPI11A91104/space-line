@@ -593,7 +593,9 @@ body[data-browse-only="true"] .spot {pointer-events:none;}
 .panel.poster .poster-actions > * {grid-column:1;width:100%;min-height:48px;box-sizing:border-box;}
 .panel.poster .poster-actions #next-person {background:#382318;border:1px solid #a46a39;color:#fff0d4;}
 #guide #back-form {min-height:44px;border:1px solid #a46a39;background:#382318;color:#fff0d4;font-size:13px;}
-#guide .space-tools {display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));}
-#guide .space-tools button {width:100%;min-width:0;}
+#guide .space-tools {display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));grid-auto-rows:44px;flex:none;align-items:center;}
+#guide .space-tools button {width:100%;min-width:0;height:44px;min-height:44px;max-height:44px;flex:none;display:flex;align-items:center;justify-content:center;line-height:1.2;}
+#guide .space-tools button[hidden] {display:none;}
+#guide {flex-wrap:nowrap;}
 body[data-browse-only="true"] .spot.occupied {pointer-events:auto;}
 body[data-view="space"]:has(.overview-fallback) {height:auto;overflow:auto;}
