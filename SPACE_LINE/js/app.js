@@ -9,7 +9,8 @@ const names = {
   uranus: "天王星",
   neptune: "海王星",
 };
-const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星"];
+const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星","星くま","月のフクロウ","宇宙クジラ","探査ドローン","星の旅人"];
+const avatarIds=Array.from({length:17},(_,i)=>i+5);
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
 let planetViewer = null, viewerRequest = 0;
@@ -103,7 +104,7 @@ function renderRecords() {
   for (const [id, name] of Object.entries(names)) {
     const btn = document.querySelector(`[data-planet="${id}"]`);
     if (btn) {
-      const free = 64 - records.filter((r) => r.planetId === id).length;
+      const free = 128 - records.filter((r) => r.planetId === id).length;
       btn.textContent = `${name} ${free === 0 ? "満員" : "空き " + free}`;
     }
   }
@@ -173,7 +174,7 @@ async function ensureSolar() {
           reject(Error("3Dを表示できません。別のブラウザでお試しください。")),
         { once: true },
       );
-      import("../solar/solar.bundle.js?v=20261107-3").catch(reject);
+      import("../solar/solar.bundle.js?v=20261107-4").catch(reject);
     });
   }
   await solarLoading;
@@ -183,13 +184,22 @@ async function exploreOverview(overview = true, planetId = selectedPlanet) {
   $("panel").innerHTML = "";
   $("panel").className = "panel";
   $("my-poster").hidden = !myRecord;
+  document.body.dataset.browseOnly=String(!!myRecord);
+  $("planet-nav").hidden=!!myRecord;
+  $("space-checkin").hidden=true;
+  $("space-find-free").hidden=true;
+  $("back-form").textContent=myRecord?'最初から新しく始める':'星を選び直す';
+  $("space-target-name").textContent=myRecord?'太陽系を見渡す':'星を選んで、近づこう';
   try {
     await ensureSolar();
-    if (overview) window.SpaceSolar?.overview();
+    window.SpaceSolar?.setBrowseOnly(!!myRecord);
+    if (overview || myRecord) window.SpaceSolar?.overview();
     else window.SpaceSolar?.focus(planetId);
     renderRecords();
   } catch (err) {
-    enterFlatPlanet(planetId);
+    if(myRecord){
+      $("panel").innerHTML='<div class="overview-fallback"><h2>太陽系</h2><p>この端末では3Dを表示できません。</p><div class="overview-planets">'+Object.entries(names).map(([id,name])=>`<figure><img src="assets/planet-preview/${id}.webp" alt=""><figcaption>${name}</figcaption></figure>`).join('')+'</div></div>';
+    }else enterFlatPlanet(planetId);
     if ($("loader")) $("loader").hidden = true;
     console.warn(err.message);
   }
@@ -201,6 +211,7 @@ const planetCopy = {
   uranus: "淡い青緑に包まれた、静かな氷の惑星。", neptune: "深い青の、その先へ。"
 };
 function explore() {
+  if(myRecord) return exploreOverview(true);
   setView("picker");
   $("panel").className="planet-picker";
   const ids=Object.keys(names);
@@ -254,15 +265,16 @@ function createFlatViewer(host,id,onTarget,onStatus){
   let index=0,rows=[];
   const detail=()=>{const slotId=`${id}-${String(index+1).padStart(2,'0')}`;return {planetId:id,slotId,record:rows.find(r=>r.slotId===slotId)};};
   const update=()=>onTarget(detail());
-  $("spot-prev").onclick=()=>{index=(index+63)%64;update();};
-  $("spot-next").onclick=()=>{index=(index+1)%64;update();};
+  $("spot-prev").onclick=()=>{index=(index+127)%128;update();};
+  $("spot-next").onclick=()=>{index=(index+1)%128;update();};
   onStatus('この端末では矢印で地点を選べます。');
-  return {setRecords(value){rows=value;update();},findFree(){for(let n=1;n<=64;n++){const i=(index+n)%64;if(!rows.some(r=>r.slotId===`${id}-${String(i+1).padStart(2,'0')}`)){index=i;update();return true;}}return false;},dispose(){host.replaceChildren();}};
+  return {setRecords(value){rows=value;update();},findFree(){for(let n=1;n<=128;n++){const i=(index+n)%128;if(!rows.some(r=>r.slotId===`${id}-${String(i+1).padStart(2,'0')}`)){index=i;update();return true;}}return false;},dispose(){host.replaceChildren();}};
 }
-$("back-form").onclick = explore;
+$("back-form").onclick = () => myRecord ? confirmNewParticipant() : explore();
 let spaceTarget=null;
 window.addEventListener('space-target',e=>{
-  spaceTarget=e.detail;const target=spaceTarget;
+  spaceTarget=myRecord?null:e.detail;const target=spaceTarget;
+  if(myRecord){$("space-checkin").hidden=true;$("space-find-free").hidden=true;return;}
   $("space-target-name").textContent=target?`${names[target.planetId]} / 地点 ${target.slotId.split('-')[1]}`:'星を選んで、近づこう';
   $("space-checkin").hidden=!target;$("space-checkin").textContent=target?.record?'メッセージを見る':'ここにチェックイン';
   $("space-find-free").hidden=!target;
@@ -296,7 +308,7 @@ function registration() {
   $("panel").innerHTML =
     `<h1 class="brand-heading">SPACE LINE</h1><p class="brand-subtitle">22世紀の宇宙交通</p>
   <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="20" placeholder="例：そら" autocomplete="nickname">
-  <label>アバター *</label><div class="avatars">${Array.from({length:16},(_,j)=>j+1).map((i) => `<label><img src="assets/avatar-${i}.svg" alt="${avatarNames[i-1]}"><input type="radio" name="avatar" value="${i}" ${i === (profile?.avatarId || 1) ? "checked" : ""}></label>`).join("")}</div>
+  <label>アバター *</label><div class="avatars">${avatarIds.map((i) => `<label><img src="assets/avatar-${i}.svg" alt="${avatarNames[i-1]}"><input type="radio" name="avatar" value="${i}" ${i === (avatarIds.includes(profile?.avatarId) ? profile.avatarId : 5) ? "checked" : ""}></label>`).join("")}</div>
   <label for="region">出発地（任意）</label><input id="region" maxlength="30" placeholder="例：東京 / 大阪">
   <p class="hint">ニックネーム・アバター・メッセージは公開されます。</p>
   <div class="actions"><button id="start" class="primary">星を選ぶ</button></div></form>
@@ -305,7 +317,7 @@ function registration() {
     $("panel").innerHTML =
       `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">作成済みのポスターを見る</button><button id="resume-space">みんなの宇宙を見る</button><button id="new-person">新しい参加者として始める</button></div>`;
     $("resume-poster").onclick = showPoster;
-    $("resume-space").onclick = () => explore(true);
+    $("resume-space").onclick = () => exploreOverview(true);
     $("new-person").onclick = confirmNewParticipant;
     return;
   }
@@ -325,6 +337,7 @@ function registration() {
   };
 }
 window.addEventListener("space-spot", async (e) => {
+  if(myRecord) return;
   const { planetId, slotId } = e.detail;
   const record = records.find(r => r.slotId === slotId);
   if (record) {
@@ -527,12 +540,11 @@ async function showPoster() {
     const result = await makePoster();
     posterUrl = result.url;
     $("panel").innerHTML =
-      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">宇宙に戻る</button><button id="edit-message">メッセージを編集</button><button id="next-person">新しくはじめる</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
+      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">宇宙に戻る</button><button id="next-person">新しくはじめる</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
     $("poster").src = posterUrl;
     $("download").href = posterUrl;
-    $("all").onclick = () => explore(true);
+    $("all").onclick = () => exploreOverview(true);
     $("next-person").onclick = confirmNewParticipant;
-    $("edit-message").onclick = writeMessage;
     $("my-poster").hidden = false;
   } catch (err) {
     $("panel").innerHTML =

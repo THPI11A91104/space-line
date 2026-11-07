@@ -946,6 +946,7 @@ function focusOffset(planet, planetPosition) {
  * flight began, and jumps straight there when the visitor prefers reduced motion.
  */
 function focusPlanet(name) {
+  if(browseOnly) return;
   const planet = planets.get(name);
 
   if (!planet) {
@@ -1798,9 +1799,10 @@ init().catch((error) => {
 
 // 固定地点は惑星の子要素にして、公転・自転に追従させます。
 let showRoutes = false;
+let browseOnly = false;
 const checkinMarkers = [];
 let checkinRecords = [];
-// 旧32地点は固定し、空いている領域に32地点を追加します。
+// 既存の地点座標を保ち、空いた領域へ順に追加する。
 function checkinDirections() {
   const point = (i, count) => {
     const y = 1 - (2 * (i + 0.5)) / count;
@@ -1813,7 +1815,7 @@ function checkinDirections() {
   };
   const result = Array.from({ length: 32 }, (_, i) => point(i, 32));
   const candidates = Array.from({ length: 1024 }, (_, i) => point(i, 1024));
-  while (result.length < 64) {
+  while (result.length < 128) {
     let best = null,
       distance = -1;
     for (const candidate of candidates) {
@@ -1833,7 +1835,7 @@ function installCheckinMarkers() {
   const directions = checkinDirections();
   for (const planet of planets.values()) {
     if (planet.name === "earth") continue;
-    for (let i = 0; i < 64; i++) {
+    for (let i = 0; i < 128; i++) {
       const normal = directions[i];
       const element = document.createElement("button");
       element.className = "spot";
@@ -1844,6 +1846,7 @@ function installCheckinMarkers() {
       element.addEventListener("pointerdown", (e) => e.stopPropagation());
       element.addEventListener("click", (e) => {
         e.stopPropagation();
+        if(browseOnly) return;
         window.dispatchEvent(
           new CustomEvent("space-spot", {
             detail: {
@@ -1858,12 +1861,14 @@ function installCheckinMarkers() {
     }
   }
   window.SpaceSolar = {
+    setBrowseOnly(value) { browseOnly=!!value; activeTarget=null; targetSnap=null; targetKey="refresh"; if(browseOnly)resetCamera(); },
     setRoutes(show) {
       showRoutes = show;
     },
     focus: focusPlanet,
     overview: resetCamera,
     findFree() {
+      if(browseOnly)return false;
       const candidates=checkinMarkers.filter(m=>m.planet.name===state.followed&&!checkinRecords.some(r=>r.slotId===m.slotId));
       if(!candidates.length)return false;
       const index=candidates.findIndex(m=>m.slotId===activeTarget?.slotId);
@@ -1923,7 +1928,7 @@ function updateCheckinMarkers() {
     m.planet.mesh.getWorldPosition(center);m.label.getWorldPosition(point);
     const front=point.clone().sub(center).dot(camera.position.clone().sub(point))>0;
     m.front=front;
-    if(front&&m.planet.name===state.followed&&!state.flight){
+    if(!browseOnly&&front&&m.planet.name===state.followed&&!state.flight){
       const screen=point.clone().project(camera),distance=screen.x*screen.x+screen.y*screen.y;
       if(screen.z<1&&distance<nearest){nearest=distance;candidate=m;}
     }
@@ -1933,6 +1938,7 @@ function updateCheckinMarkers() {
     const isOccupied=occupied.has(m.slotId),isTarget=m===candidate;
     m.label.visible=m.front&&(isOccupied||isTarget);
     m.element.classList.toggle('targeted',isTarget);
+    m.element.disabled=browseOnly;
     m.element.style.opacity=isTarget?'1':'.8';
     m.element.style.transform=state.followed===m.planet.name?'scale(1)':'scale(.6)';
   }

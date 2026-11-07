@@ -88,10 +88,10 @@ const server = http.createServer(async (req, res) => {
         typeof data.username !== "string" ||
         !data.username.trim() ||
         [...data.username].length > 20 ||
-        (!Number.isInteger(data.avatarId) || data.avatarId < 1 || data.avatarId > 16) ||
+        (!Number.isInteger(data.avatarId) || data.avatarId < 1 || data.avatarId > 21) ||
         !planets.includes(data.planetId) ||
         !Array.from(
-          { length: 64 },
+          { length: 128 },
           (_, i) => `${data.planetId}-${String(i + 1).padStart(2, "0")}`,
         ).includes(data.slotId)
       )

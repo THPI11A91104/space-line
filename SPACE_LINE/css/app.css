@@ -576,3 +576,15 @@ dialog .actions .primary {order:-1;}
 @media(prefers-reduced-motion:reduce) {.destination-card {transition:none;}.destination-card.selected .destination-world {animation:none;}}
 
 @font-face {font-family:PosterDisplay;src:url("../assets/poster-display.ttf") format("truetype");font-display:swap;}
+
+/* Secondary actions remain visible on touch screens. */
+.picker-secondary {gap:12px;margin:22px auto 0;max-width:620px;padding:0 16px;}
+.picker-secondary .quiet {flex:1 1 145px;min-height:48px;padding:12px 18px;border:1px solid #d68b43;background:#382318;color:#fff0d4;font-size:15px;font-weight:700;border-radius:8px;box-shadow:inset 0 1px #ffce8540;}
+.picker-secondary .quiet:hover,.picker-secondary .quiet:focus-visible {background:#71401d;border-color:#ffb366;outline:2px solid #ffb366;outline-offset:3px;}
+body[data-browse-only="true"] #planet-nav,body[data-browse-only="true"] #space-checkin,body[data-browse-only="true"] #space-find-free {display:none!important;}
+body[data-browse-only="true"] #back-form {background:#ff812e;color:#211109;border:1px solid #ffb366;font-weight:700;min-height:48px;}
+body[data-browse-only="true"] .spot {pointer-events:none;}
+.overview-fallback {padding:30px 16px 230px;max-width:850px;margin:auto;text-align:center;}
+.overview-planets {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+.overview-planets figure {margin:0;}.overview-planets img {width:100%;}
+@media(max-width:540px){.overview-planets{grid-template-columns:repeat(2,minmax(0,1fr));}.picker-secondary .quiet{flex-basis:40%;font-size:14px;}}
