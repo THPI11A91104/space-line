@@ -12,6 +12,10 @@ const names = {
 };
 const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星","星くま","月のフクロウ","宇宙クジラ","探査ドローン","星の旅人"];
 const avatarIds=Array.from({length:17},(_,i)=>i+5);
+const currentAvatarId = (id) => {
+  const value = Number(id);
+  return value >= 1 && value <= 4 ? value + 4 : avatarIds.includes(value) ? value : 5;
+};
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
 let planetViewer = null, viewerRequest = 0;
@@ -44,6 +48,7 @@ if (!clientId) {
 try {
   profile = JSON.parse(sessionStorage.getItem(key + "-profile"));
 } catch {}
+if (profile) profile.avatarId = currentAvatarId(profile.avatarId);
 const pendingMessage = () => !!myRecord && localStorage.getItem(key + '-pending-record') === myRecord.id;
 let restoringRoute = false;
 function rememberRoute(route, replace = false) {
@@ -125,6 +130,8 @@ async function refresh() {
   }
 }
 function renderRecords() {
+  for (const record of records) record.avatarId = currentAvatarId(record.avatarId);
+  if (myRecord) myRecord.avatarId = currentAvatarId(myRecord.avatarId);
   window.SpaceSolar?.setRecords(records);
   planetViewer?.setRecords(records);
   for (const [id, name] of Object.entries(names)) {
