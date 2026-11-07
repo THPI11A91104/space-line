@@ -945,6 +945,22 @@ function focusOffset(planet, planetPosition) {
  * CONFIG.focus.flightDuration, aiming at where the planet is on each frame rather than where it was when the
  * flight began, and jumps straight there when the visitor prefers reduced motion.
  */
+const upgradedTextures=new Map();
+async function upgradePlanetTexture(planet) {
+  if(!planet || planet.name==='earth' || upgradedTextures.has(planet.name))return;
+  const name=planet.name;
+  upgradedTextures.set(name,true);
+  try {
+    const texture=await new THREE.TextureLoader().loadAsync(`textures/${name}/${name}.webp`);
+    texture.colorSpace=THREE.SRGBColorSpace;
+    texture.anisotropy=renderer.capabilities.getMaxAnisotropy();
+    const material=planet.mesh.material, previous=material.map;
+    material.map=texture;
+    if(material.bumpMap===previous)material.bumpMap=texture;
+    material.needsUpdate=true;
+    if(previous)previous.dispose();
+  } catch { upgradedTextures.delete(name); }
+}
 function focusPlanet(name) {
   if(browseOnly) return;
   const planet = planets.get(name);
@@ -954,6 +970,8 @@ function focusPlanet(name) {
   }
 
   targetSnap=null;
+  void upgradePlanetTexture(planet);
+  if(scene.fog){scene.fog.near=CONFIG.scene.fogNear;scene.fog.far=CONFIG.scene.fogFar;}
   state.selectedPlanet = name;
   state.followed = name;
 
@@ -1403,7 +1421,16 @@ function enablePicking() {
 }
 
 function resetCamera() {
-  camera.position.copy(CONFIG.camera.position);
+  targetSnap=null;
+  activeTarget=null;
+  targetKey='refresh';
+  const extent=55;
+  const halfFov=THREE.MathUtils.degToRad(camera.fov/2);
+  const distance=extent/Math.sin(Math.atan(Math.tan(halfFov)*Math.min(1,camera.aspect)));
+  controls.maxDistance=Math.max(CONFIG.controls.maxDistance,distance*1.4);
+  if(scene.fog){scene.fog.near=distance+extent;scene.fog.far=distance+extent+120;}
+  camera.position.copy(CONFIG.camera.position).normalize().multiplyScalar(distance);
+  camera.lookAt(0,0,0);
   controls.target.set(0, 0, 0);
   controls.minDistance = CONFIG.controls.minDistance;
   state.selectedPlanet = "earth";
@@ -1846,7 +1873,7 @@ function installCheckinMarkers() {
       element.addEventListener("pointerdown", (e) => e.stopPropagation());
       element.addEventListener("click", (e) => {
         e.stopPropagation();
-        if(browseOnly) return;
+        if(browseOnly&&!checkinRecords.some(r=>r.slotId===slotId)) return;
         window.dispatchEvent(
           new CustomEvent("space-spot", {
             detail: {
@@ -1938,7 +1965,7 @@ function updateCheckinMarkers() {
     const isOccupied=occupied.has(m.slotId),isTarget=m===candidate;
     m.label.visible=m.front&&(isOccupied||isTarget);
     m.element.classList.toggle('targeted',isTarget);
-    m.element.disabled=browseOnly;
+    m.element.disabled=browseOnly&&!isOccupied;
     m.element.style.opacity=isTarget?'1':'.8';
     m.element.style.transform=state.followed===m.planet.name?'scale(1)':'scale(.6)';
   }

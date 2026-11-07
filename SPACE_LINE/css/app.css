@@ -588,3 +588,12 @@ body[data-browse-only="true"] .spot {pointer-events:none;}
 .overview-planets {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
 .overview-planets figure {margin:0;}.overview-planets img {width:100%;}
 @media(max-width:540px){.overview-planets{grid-template-columns:repeat(2,minmax(0,1fr));}.picker-secondary .quiet{flex-basis:40%;font-size:14px;}}
+
+.panel.poster .poster-actions {grid-template-columns:minmax(0,1fr);gap:10px;}
+.panel.poster .poster-actions > * {grid-column:1;width:100%;min-height:48px;box-sizing:border-box;}
+.panel.poster .poster-actions #next-person {background:#382318;border:1px solid #a46a39;color:#fff0d4;}
+#guide #back-form {min-height:44px;border:1px solid #a46a39;background:#382318;color:#fff0d4;font-size:13px;}
+#guide .space-tools {display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));}
+#guide .space-tools button {width:100%;min-width:0;}
+body[data-browse-only="true"] .spot.occupied {pointer-events:auto;}
+body[data-view="space"]:has(.overview-fallback) {height:auto;overflow:auto;}

@@ -89,6 +89,7 @@ const server = http.createServer(async (req, res) => {
         !data.username.trim() ||
         [...data.username].length > 20 ||
         (!Number.isInteger(data.avatarId) || data.avatarId < 1 || data.avatarId > 21) ||
+        (data.region !== undefined && (typeof data.region !== "string" || [...data.region].length > 30)) ||
         !planets.includes(data.planetId) ||
         !Array.from(
           { length: 128 },
@@ -101,13 +102,14 @@ const server = http.createServer(async (req, res) => {
       // 地点の重複確認から保存までは同期処理。
       if (records.some((r) => r.slotId === data.slotId))
         return json(409, {
-          error: "先に他の人が選びました。別の白い点を選んでください。",
+          error: "先に他の人が選びました。別の地点を選んでください。",
         });
       const record = {
         id: crypto.randomUUID(),
         clientId: data.clientId,
         username: data.username.trim(),
         avatarId: data.avatarId,
+        region: data.region?.trim() || "",
         planetId: data.planetId,
         slotId: data.slotId,
         ticketId: "SL-" + String(records.length + 1).padStart(4, "0"),

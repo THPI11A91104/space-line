@@ -1,3 +1,4 @@
+import { resolveRoute } from "./flow.js?v=20261107-5";
 const $ = (id) => document.getElementById(id);
 const names = {
   mercury: "水星",
@@ -43,6 +44,31 @@ if (!clientId) {
 try {
   profile = JSON.parse(sessionStorage.getItem(key + "-profile"));
 } catch {}
+const pendingMessage = () => !!myRecord && localStorage.getItem(key + '-pending-record') === myRecord.id;
+let restoringRoute = false;
+function rememberRoute(route, replace = false) {
+  const value = { route, planetId: selectedPlanet, participant: clientId };
+  sessionStorage.setItem(key + '-route', JSON.stringify(value));
+  const same = history.state?.spaceLine?.route === route && history.state?.spaceLine?.planetId === selectedPlanet && history.state?.spaceLine?.participant === clientId;
+  if (replace || restoringRoute || !history.state?.spaceLine || same) history.replaceState({ spaceLine: value }, '');
+  else history.pushState({ spaceLine: value }, '');
+}
+async function restoreRoute(value) {
+  const requested = value?.participant === clientId ? value.route : 'form';
+  const route = resolveRoute(requested, { hasProfile: !!profile?.username, hasRecord: !!myRecord, pending: pendingMessage() });
+  if (names[value?.planetId]) selectedPlanet = value.planetId;
+  restoringRoute = true;
+  if ($('dialog').open) $('dialog').close();
+  try {
+    if (route === 'picker') explore();
+    else if (route === 'planet') await enterPlanet(selectedPlanet);
+    else if (route === 'overview') await exploreOverview(true);
+    else if (route === 'message') writeMessage();
+    else if (route === 'poster') await showPoster();
+    else registration();
+  } finally { restoringRoute = false; }
+}
+window.addEventListener('popstate', e => { void restoreRoute(e.state?.spaceLine); });
 function message(text) {
   $("dialog").innerHTML =
     `<p>${escape(text)}</p><button id="close">閉じる</button>`;
@@ -109,13 +135,6 @@ function renderRecords() {
     }
   }
 }
-window.addEventListener("space-error", () => {
-  const start = $("start");
-  if (start) {
-    start.disabled = true;
-    start.textContent = "このブラウザでは3Dを表示できません";
-  }
-});
 window.addEventListener("space-ready", () => {
   ready = true;
   renderRecords();
@@ -142,19 +161,20 @@ $("planet-nav").onclick = (e) => {
       );
   }
 };
-$("overview").onclick = () => window.SpaceSolar?.overview();
+$("overview").onclick = () => exploreOverview(true);
 $("routes").onclick = () => {
   const show = $("routes").getAttribute("aria-pressed") !== "true";
   $("routes").setAttribute("aria-pressed", String(show));
   $("routes").textContent = show ? "航路を隠す" : "航路を表示";
   window.SpaceSolar?.setRoutes(show);
-  if (show) window.SpaceSolar?.overview();
+  if (show) exploreOverview(true);
 };
 $("my-poster").onclick = () => showPoster();
 // 3Dはフォーム送信後に読み込む。
 let solarLoading;
 function setView(view) {
   viewerRequest++;
+  $("loader").hidden = true;
   planetViewer?.dispose();
   planetViewer = null;
   document.body.dataset.view = view;
@@ -174,13 +194,17 @@ async function ensureSolar() {
           reject(Error("3Dを表示できません。別のブラウザでお試しください。")),
         { once: true },
       );
-      import("../solar/solar.bundle.js?v=20261107-4").catch(reject);
+      import("../solar/solar.bundle.js?v=20261107-5").catch(reject);
     });
   }
   await solarLoading;
 }
 async function exploreOverview(overview = true, planetId = selectedPlanet) {
+  if(pendingMessage()) return writeMessage();
+  rememberRoute(overview || myRecord ? 'overview' : 'planet');
   setView("space");
+  const request=viewerRequest;
+  if(!ready) $("loader").hidden=false;
   $("panel").innerHTML = "";
   $("panel").className = "panel";
   $("my-poster").hidden = !myRecord;
@@ -188,17 +212,21 @@ async function exploreOverview(overview = true, planetId = selectedPlanet) {
   $("planet-nav").hidden=!!myRecord;
   $("space-checkin").hidden=true;
   $("space-find-free").hidden=true;
-  $("back-form").textContent=myRecord?'最初から新しく始める':'星を選び直す';
+  $("back-form").textContent=myRecord?'もう一度体験する':'星を選び直す';
+  document.querySelector(".space-target-caption small").textContent=myRecord?"SOLAR SYSTEM":"LANDING POINT";
   $("space-target-name").textContent=myRecord?'太陽系を見渡す':'星を選んで、近づこう';
   try {
     await ensureSolar();
+    if(request!==viewerRequest)return;
+    $("loader").hidden=true;
     window.SpaceSolar?.setBrowseOnly(!!myRecord);
     if (overview || myRecord) window.SpaceSolar?.overview();
     else window.SpaceSolar?.focus(planetId);
     renderRecords();
   } catch (err) {
-    if(myRecord){
-      $("panel").innerHTML='<div class="overview-fallback"><h2>太陽系</h2><p>この端末では3Dを表示できません。</p><div class="overview-planets">'+Object.entries(names).map(([id,name])=>`<figure><img src="assets/planet-preview/${id}.webp" alt=""><figcaption>${name}</figcaption></figure>`).join('')+'</div></div>';
+    if(request!==viewerRequest)return;
+    if(myRecord || overview){
+      $("panel").innerHTML='<div class="overview-fallback"><h2>太陽系</h2><p>この端末では3Dを表示できません。</p><div class="overview-planets">'+Object.entries(names).map(([id,name])=>`<figure><img src="assets/planet-preview-hd/${id}.webp" alt=""><figcaption>${name}</figcaption></figure>`).join('')+'</div></div>';
     }else enterFlatPlanet(planetId);
     if ($("loader")) $("loader").hidden = true;
     console.warn(err.message);
@@ -212,19 +240,21 @@ const planetCopy = {
 };
 function explore() {
   if(myRecord) return exploreOverview(true);
+  rememberRoute("picker");
   setView("picker");
   $("panel").className="planet-picker";
   const ids=Object.keys(names);
   let index=Math.max(0,ids.indexOf(selectedPlanet)),drag=null;
   $("panel").innerHTML=`<div class="picker-heading"><span class="section-code">01 / DESTINATION</span><h1>行き先を選ぶ</h1></div>
     <div class="destination-stage" tabindex="0" aria-label="左右にスワイプして星を選択"><div class="stage-orbit" aria-hidden="true"></div>
-    ${ids.map((id,i)=>`<button type="button" class="destination-card" data-id="${id}" aria-label="${names[id]}を選ぶ"><div class="portal-outline" aria-hidden="true"></div><span class="destination-no">SL / ${String(i+1).padStart(2,'0')}</span><div class="destination-world ${id==='saturn'?'saturn-world':''}"><img src="assets/planet-preview/${id}.webp" alt="" draggable="false" width="240" height="240"></div><span class="destination-en">${id.toUpperCase()}</span><strong>${names[id]}</strong></button>`).join('')}</div>
+    ${ids.map((id,i)=>`<button type="button" class="destination-card" data-id="${id}" aria-label="${names[id]}を選ぶ"><div class="portal-outline" aria-hidden="true"></div><span class="destination-no">SL / ${String(i+1).padStart(2,'0')}</span><div class="destination-world ${id==='saturn'?'saturn-world':''}"><img src="assets/planet-preview-hd/${id}.webp" alt="" draggable="false" width="768" height="768" decoding="async"></div><span class="destination-en">${id.toUpperCase()}</span><strong>${names[id]}</strong></button>`).join('')}</div>
     <div class="destination-info"><span id="planet-count"></span><p id="destination-copy"></p></div>
     <div class="destination-dock"><button id="previous-planet" aria-label="前の星">←</button><button id="enter-planet" class="primary">この星へ進む <span aria-hidden="true">↗</span></button><button id="next-planet" aria-label="次の星">→</button></div>
     <div class="destination-pagination" aria-label="星の一覧">${ids.map(id=>`<button data-jump="${id}" aria-label="${names[id]}"></button>`).join('')}</div>
-    <p class="gesture-hint">SWIPE / DRAG TO EXPLORE</p><div class="picker-secondary"><button id="solar-overview" class="quiet">宇宙を見渡す</button>${myRecord?'<button id="picker-poster" class="quiet">自分のポスター</button>':''}<button id="picker-back" class="quiet">戻る</button></div>`;
+    <div class="picker-secondary"><button id="solar-overview" class="quiet">宇宙を見渡す</button>${myRecord?'<button id="picker-poster" class="quiet">自分のポスター</button>':''}<button id="picker-back" class="quiet">戻る</button></div>`;
   const stage=document.querySelector('.destination-stage'),cards=[...document.querySelectorAll('.destination-card')];
   function move(next){index=Math.max(0,Math.min(ids.length-1,next));selectedPlanet=ids[index];
+    rememberRoute("picker",true);
     cards.forEach((card,i)=>{const offset=i-index;card.style.setProperty('--offset',offset);card.style.setProperty('--distance',Math.abs(offset));card.classList.toggle('selected',i===index);card.hidden=Math.abs(offset)>2;card.tabIndex=i===index?0:-1;card.setAttribute('aria-pressed',String(i===index));});
     document.querySelectorAll('[data-jump]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.jump===selectedPlanet)));
     $("planet-count").textContent=`${String(index+1).padStart(2,'0')} — ${String(ids.length).padStart(2,'0')}`;$("destination-copy").textContent=planetCopy[selectedPlanet];
@@ -245,6 +275,8 @@ function explore() {
 }
 async function enterPlanet(id){selectedPlanet=id;await exploreOverview(false,id);}
 async function enterFlatPlanet(id) {
+  if(myRecord)return exploreOverview(true);
+  rememberRoute("planet");
   selectedPlanet=id;setView("inspect");const request=viewerRequest;
   $("panel").className="planet-inspector";
   $("panel").innerHTML=`<div class="inspect-heading"><small>${id.toUpperCase()}</small><h1>${names[id]}</h1></div><div id="planet-stage"><div class="aim-guide" aria-hidden="true"></div></div><div class="inspect-actions"><p id="planet-status" class="hint" role="status">星を準備しています…</p><strong id="target-name" aria-live="polite">場所を探しています</strong><button id="choose-target" class="primary" disabled>ここにチェックイン</button><button id="find-free" class="quiet" disabled>空き地点を探す</button><button id="choose-another" class="quiet">星を選び直す</button></div>`;
@@ -261,7 +293,7 @@ async function enterFlatPlanet(id) {
   }catch(err){if(request!==viewerRequest)return;$("planet-status").textContent='読み込めませんでした。再試行してください。';$("choose-target").disabled=false;$("choose-target").textContent='再試行';$("choose-target").onclick=()=>enterFlatPlanet(id);console.error(err);}
 }
 function createFlatViewer(host,id,onTarget,onStatus){
-  host.innerHTML=`<img src="assets/planet-preview/${id}.webp" alt="${names[id]}" style="height:75%;max-width:100%;object-fit:contain;display:block;margin:auto"><div class="picker-controls"><button id="spot-prev" aria-label="前の地点">←</button><span>地点を選択</span><button id="spot-next" aria-label="次の地点">→</button></div>`;
+  host.innerHTML=`<img src="assets/planet-preview-hd/${id}.webp" alt="${names[id]}" style="height:75%;max-width:100%;object-fit:contain;display:block;margin:auto"><div class="picker-controls"><button id="spot-prev" aria-label="前の地点">←</button><span>地点を選択</span><button id="spot-next" aria-label="次の地点">→</button></div>`;
   let index=0,rows=[];
   const detail=()=>{const slotId=`${id}-${String(index+1).padStart(2,'0')}`;return {planetId:id,slotId,record:rows.find(r=>r.slotId===slotId)};};
   const update=()=>onTarget(detail());
@@ -285,16 +317,21 @@ $("space-find-free").onclick=()=>{if(!window.SpaceSolar?.findFree())message('こ
 function newParticipant() {
   clientId = uuid();
   localStorage.setItem(key + "-client", clientId);
+  if(myRecord)sessionStorage.removeItem(key + "-message-" + myRecord.id);
+  localStorage.removeItem(key + "-pending-record");
   localStorage.removeItem(key + "-record");
   sessionStorage.removeItem(key + "-profile");
   profile = null;
   myRecord = null;
   posterUrl = null;
-  registration();
+  selectedPlanet="moon";
+  window.SpaceSolar?.setBrowseOnly(false);
+  document.body.dataset.browseOnly="false";
+  restoringRoute=true;registration();restoringRoute=false;
 }
 function confirmNewParticipant() {
   $("dialog").innerHTML =
-    '<h2>新しい参加者として始めますか？</h2><p>今のポスターを保存してから進んでください。これまでのチェックインは残ります。</p><div class="actions"><button id="confirm-new" class="primary">新しく始める</button><button id="cancel-new">戻る</button></div>';
+    '<h2>もう一度体験しますか？</h2><p>入力画面からやり直します。これまでのチェックインは残ります。</p><div class="actions"><button id="confirm-new" class="primary">もう一度体験する</button><button id="cancel-new">戻る</button></div>';
   $("cancel-new").onclick = () => $("dialog").close();
   $("confirm-new").onclick = () => {
     $("dialog").close();
@@ -303,6 +340,7 @@ function confirmNewParticipant() {
   $("dialog").showModal();
 }
 function registration() {
+  rememberRoute("form");
   setView("form");
   $("panel").className = "panel";
   $("panel").innerHTML =
@@ -315,14 +353,20 @@ function registration() {
   `;
   if (myRecord) {
     $("panel").innerHTML =
-      `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">作成済みのポスターを見る</button><button id="resume-space">みんなの宇宙を見る</button><button id="new-person">新しい参加者として始める</button></div>`;
-    $("resume-poster").onclick = showPoster;
-    $("resume-space").onclick = () => exploreOverview(true);
+      `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">${pendingMessage()?"続きからポスターをつくる":"作成済みのポスターを見る"}</button>${pendingMessage()?"":'<button id="resume-space">みんなの宇宙を見る</button>'}<button id="new-person">もう一度体験する</button></div>`;
+    $("resume-poster").onclick = pendingMessage()?writeMessage:showPoster;
+    if($("resume-space")) $("resume-space").onclick = () => exploreOverview(true);
     $("new-person").onclick = confirmNewParticipant;
     return;
   }
   $("nickname").value = profile?.username || "";
   $("region").value = profile?.region || "";
+  const saveProfile=()=>{
+    profile={username:$("nickname").value.trim(),avatarId:Number(new FormData($("form")).get("avatar")),region:$("region").value.trim()};
+    sessionStorage.setItem(key + "-profile", JSON.stringify(profile));
+  };
+  $("form").oninput=saveProfile;
+  $("form").onchange=saveProfile;
   $("form").onsubmit = (e) => {
     e.preventDefault();
     const username = $("nickname").value.trim();
@@ -337,7 +381,6 @@ function registration() {
   };
 }
 window.addEventListener("space-spot", async (e) => {
-  if(myRecord) return;
   const { planetId, slotId } = e.detail;
   const record = records.find(r => r.slotId === slotId);
   if (record) {
@@ -364,6 +407,7 @@ window.addEventListener("space-spot", async (e) => {
         clientId,
         username: profile.username,
         avatarId: profile.avatarId,
+        region: profile.region || "",
         planetId,
         slotId,
       };
@@ -393,6 +437,7 @@ window.addEventListener("space-spot", async (e) => {
         renderRecords();
       }
       localStorage.setItem(key + "-record", myRecord.id);
+      localStorage.setItem(key + "-pending-record", myRecord.id);
       $("dialog").close();
       writeMessage();
     } catch (error) {
@@ -403,11 +448,15 @@ window.addEventListener("space-spot", async (e) => {
   $("dialog").showModal();
 });
 function writeMessage() {
+  if(!myRecord)return registration();
+  if(!pendingMessage())return showPoster();
+  rememberRoute("message");
   setView("form");
   $("panel").className = "panel";
   $("panel").innerHTML =
     `<h1>未来へ、一言。</h1><p>${displayNames[myRecord.planetId]}の${escape(myRecord.slotId.split("-")[1])}番地点にチェックインしました。</p><form id="message-form"><label for="message">未来へのメッセージ（任意・60文字以内）</label><textarea id="message" maxlength="60" rows="4" placeholder="100年後も、この星を大切に。"></textarea><div class="actions"><button class="primary">記念ポスターをつくる</button></div><p id="save-error" class="error"></p></form>`;
-  $("message").value = myRecord.message || "";
+  $("message").value = sessionStorage.getItem(key + "-message-" + myRecord.id) ?? myRecord.message ?? "";
+  $("message").oninput=()=>sessionStorage.setItem(key + "-message-" + myRecord.id,$("message").value);
   $("message-form").onsubmit = async (e) => {
     e.preventDefault();
     const button = e.target.querySelector("button");
@@ -430,6 +479,8 @@ function writeMessage() {
         localStorage.setItem(key + "-records", JSON.stringify(records));
         renderRecords();
       }
+      localStorage.removeItem(key + "-pending-record");
+      sessionStorage.removeItem(key + "-message-" + myRecord.id);
       await showPoster();
     } catch (err) {
       $("save-error").textContent = err.message;
@@ -505,7 +556,7 @@ async function makePoster() {
   nameLines.forEach((line,i)=>text(line,64,1716+i*nameSize*1.25,nameSize,700));
   const metaY=nameLines.length>1?1840:1796;
   text(r.ticketId,64,metaY,30,500);
-  const details=profile?.region || "";
+  const details=r.region ?? profile?.region ?? "";
   let detailSize=30,detailLines;
   do{detailLines=wrap(details,590,detailSize);if(detailLines.length<=2||detailSize<=22)break;detailSize--;}while(true);
   detailLines.forEach((line,i)=>text(line,64,metaY+48+i*detailSize*1.3,detailSize));
@@ -532,21 +583,26 @@ async function makePoster() {
   return {url:c.toDataURL("image/png"),hasQR:!!qr};
 }
 async function showPoster() {
-  if (!myRecord) return;
+  if (!myRecord) return registration();
+  if(pendingMessage())return writeMessage();
+  rememberRoute("poster");
   setView("form");
+  const request=viewerRequest;
   $("panel").className = "panel poster";
   $("panel").innerHTML = "<p>ポスターを作成しています…</p>";
   try {
     const result = await makePoster();
+    if(request!==viewerRequest)return;
     posterUrl = result.url;
     $("panel").innerHTML =
-      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">宇宙に戻る</button><button id="next-person">新しくはじめる</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
+      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">宇宙に戻る</button><button id="next-person">もう一度体験する</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
     $("poster").src = posterUrl;
     $("download").href = posterUrl;
     $("all").onclick = () => exploreOverview(true);
     $("next-person").onclick = confirmNewParticipant;
     $("my-poster").hidden = false;
   } catch (err) {
+    if(request!==viewerRequest)return;
     $("panel").innerHTML =
       '<p>画像を読み込めませんでした。</p><button id="retry">再試行</button>';
     $("retry").onclick = showPoster;
@@ -554,4 +610,6 @@ async function showPoster() {
   }
 }
 await connect();
-registration();
+let savedRoute;
+try { savedRoute=JSON.parse(sessionStorage.getItem(key+'-route')); } catch {}
+await restoreRoute(savedRoute);
