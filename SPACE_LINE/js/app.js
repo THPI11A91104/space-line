@@ -11,6 +11,8 @@ const names = {
 };
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
+let planetViewer = null, viewerRequest = 0;
+let selectedPlanet = "moon";
 let records = [],
   shared = false,
   ready = false,
@@ -49,6 +51,7 @@ function message(text) {
 // APIに接続できなければローカル保存を使う。
 async function connect() {
   try {
+    if (location.hostname.endsWith(".github.io")) throw Error("Static hosting");
     const response = await fetch("./api/state", {
       cache: "no-store",
       signal: AbortSignal.timeout(5000),
@@ -95,6 +98,7 @@ async function refresh() {
 }
 function renderRecords() {
   window.SpaceSolar?.setRecords(records);
+  planetViewer?.setRecords(records);
   for (const [id, name] of Object.entries(names)) {
     const btn = document.querySelector(`[data-planet="${id}"]`);
     if (btn) {
@@ -125,7 +129,7 @@ $("planet-nav").innerHTML = Object.entries(names)
 $("planet-nav").onclick = (e) => {
   const id = e.target.dataset.planet;
   if (id) {
-    window.SpaceSolar?.focus(id);
+    enterPlanet(id);
     document
       .querySelectorAll("[data-planet]")
       .forEach((button) =>
@@ -148,7 +152,11 @@ $("my-poster").onclick = () => showPoster();
 // 3Dはフォーム送信後に読み込む。
 let solarLoading;
 function setView(view) {
+  viewerRequest++;
+  planetViewer?.dispose();
+  planetViewer = null;
   document.body.dataset.view = view;
+  window.scrollTo(0, 0);
   $("planet-nav").hidden = view !== "space";
   $("guide").hidden = view !== "space";
 }
@@ -169,7 +177,7 @@ async function ensureSolar() {
   }
   await solarLoading;
 }
-async function explore(overview = true) {
+async function exploreOverview(overview = true) {
   setView("space");
   $("panel").innerHTML = "";
   $("panel").className = "panel";
@@ -184,6 +192,48 @@ async function explore(overview = true) {
     if ($("loader")) $("loader").hidden = true;
     message(err.message);
   }
+}
+const planetCopy = {
+  mercury: "太陽にいちばん近い、小さな岩石の星。", venus: "厚い雲に包まれた、明るく輝く星。",
+  moon: "地球のすぐそばから、宇宙の旅を。", mars: "赤い大地に、自分だけの足跡を。",
+  jupiter: "縞模様が広がる、太陽系最大の惑星。", saturn: "美しい環を眺める、遠い旅へ。",
+  uranus: "淡い青緑に包まれた、静かな氷の惑星。", neptune: "深い青の、その先へ。"
+};
+function explore() {
+  setView("picker");
+  $("panel").className = "planet-picker";
+  const ids=Object.keys(names);
+  $("panel").innerHTML = `<div class="picker-heading"><small>DESTINATION</small><h1>次は、どの星へ。</h1></div>
+    <div class="planet-carousel" tabindex="0" aria-label="左右にスワイプして星を選択">${ids.map(id=>`<article class="planet-card" data-id="${id}"><div class="preview-orbit ${id==='saturn'?'with-rings':''}"><img src="assets/planet-preview/${id}.webp" alt="${names[id]}" width="240" height="240" loading="lazy"></div><span>${id.toUpperCase()}</span><h2>${names[id]}</h2><p>${planetCopy[id]}</p></article>`).join('')}</div>
+    <div class="picker-controls"><button id="previous-planet" aria-label="前の星">←</button><span id="planet-count" aria-live="polite"></span><button id="next-planet" aria-label="次の星">→</button></div>
+    <div class="picker-actions"><button id="enter-planet" class="primary">この星へ</button>${myRecord?'<button id="picker-poster" class="quiet">自分のポスターを見る</button>':''}<button id="solar-overview" class="quiet">太陽系を俯瞰する</button><button id="picker-back" class="quiet">入力画面に戻る</button></div>`;
+  const carousel=document.querySelector('.planet-carousel'), cards=[...carousel.children];
+  let index=Math.max(0,ids.indexOf(selectedPlanet));
+  function update(i){index=i;selectedPlanet=ids[i];$("planet-count").textContent=`${String(i+1).padStart(2,'0')} / ${ids.length}`;cards.forEach((c,j)=>c.classList.toggle('selected',i===j));$("previous-planet").disabled=i===0;$("next-planet").disabled=i===ids.length-1;}
+  function move(i,smooth=true){i=Math.max(0,Math.min(ids.length-1,i));update(i);const c=cards[i];carousel.scrollTo({left:c.offsetLeft-(carousel.clientWidth-c.clientWidth)/2,behavior:smooth&&!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'instant'});}
+  carousel.addEventListener('scroll',()=>{const center=carousel.scrollLeft+carousel.clientWidth/2;let best=0,dist=Infinity;cards.forEach((c,i)=>{const d=Math.abs(c.offsetLeft+c.clientWidth/2-center);if(d<dist){best=i;dist=d;}});update(best);},{passive:true});
+  carousel.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();move(index+(e.key==='ArrowRight'?1:-1));}});
+  $("previous-planet").onclick=()=>move(index-1);$("next-planet").onclick=()=>move(index+1);
+  $("enter-planet").onclick=()=>enterPlanet(selectedPlanet);
+  $("solar-overview").onclick=()=>exploreOverview(true);
+  $("picker-back").onclick=registration;
+  if($("picker-poster"))$("picker-poster").onclick=showPoster;
+  requestAnimationFrame(()=>{if(document.body.dataset.view==='picker')move(index,false);});
+}
+async function enterPlanet(id) {
+  selectedPlanet=id;setView("inspect");const request=viewerRequest;
+  $("panel").className="planet-inspector";
+  $("panel").innerHTML=`<div class="inspect-heading"><small>${id.toUpperCase()}</small><h1>${names[id]}</h1></div><div id="planet-stage"><div class="aim-guide" aria-hidden="true"></div></div><div class="inspect-actions"><p id="planet-status" class="hint" role="status">星を準備しています…</p><strong id="target-name" aria-live="polite">場所を探しています</strong><button id="choose-target" class="primary" disabled>ここにチェックイン</button><button id="find-free" class="quiet" disabled>空き地点を探す</button><button id="choose-another" class="quiet">星を選び直す</button></div>`;
+  $("choose-another").onclick=explore;
+  let target=null;
+  try {
+    const {createViewer}=await import('./planet-viewer.bundle.js?v=20261107-1');
+    if(request!==viewerRequest)return;
+    planetViewer=createViewer($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · 地点 ${value.slotId.split('-')[1]}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
+    planetViewer.setRecords(records);$("find-free").disabled=false;
+    $("choose-target").onclick=()=>{if(target)window.dispatchEvent(new CustomEvent('space-spot',{detail:target}));};
+    $("find-free").onclick=()=>{if(!planetViewer.findFree())message('この星は満員です。別の星を選んでください。');};
+  }catch(err){if(request!==viewerRequest)return;$("planet-status").textContent='読み込めませんでした。再試行してください。';$("choose-target").disabled=false;$("choose-target").textContent='再試行';$("choose-target").onclick=()=>enterPlanet(id);console.error(err);}
 }
 $("back-form").onclick = registration;
 // 記録を残して次の参加者に切り替える。
@@ -242,7 +292,8 @@ function registration() {
   };
 }
 window.addEventListener("space-spot", async (e) => {
-  const { planetId, slotId, record } = e.detail;
+  const { planetId, slotId } = e.detail;
+  const record = records.find(r => r.slotId === slotId);
   if (record) {
     $("dialog").innerHTML =
       `<img src="assets/avatar-${record.avatarId}.svg" alt=""><h2>${escape(record.username)}</h2><p>${escape(record.message || "未来への旅を楽しもう。")}</p><p class="hint">${escape(record.ticketId)} · ${names[planetId]} / ${escape(slotId)}</p><button id="close">閉じる</button>`;
@@ -258,7 +309,7 @@ window.addEventListener("space-spot", async (e) => {
       "チェックイン済みです。自分のポスターから旅の記録をご覧ください。",
     );
   $("dialog").innerHTML =
-    `<small>${names[planetId]} · ${escape(slotId.split("-")[1])}</small><h2>ここにチェックインしますか？</h2><div class="actions"><button id="cancel">戻る</button><button id="confirm" class="primary">ここに決める</button></div><p id="error" class="error"></p>`;
+    `<small>${names[planetId]} · ${escape(slotId.split("-")[1])}</small><h2>ここにチェックインしますか？</h2><div class="actions"><button id="confirm" class="primary">ここにチェックイン</button><button id="cancel">戻る</button></div><p id="error" class="error"></p>`;
   $("cancel").onclick = () => $("dialog").close();
   $("confirm").onclick = async () => {
     $("confirm").disabled = true;
@@ -283,7 +334,7 @@ window.addEventListener("space-spot", async (e) => {
       } else {
         records = JSON.parse(localStorage.getItem(key + "-records") || "[]");
         if (records.some((r) => r.slotId === slotId))
-          throw Error("この地点は選ばれました。別の白い点を選んでください。");
+          throw Error("この地点は選ばれました。別の地点を選んでください。");
         myRecord = {
           ...data,
           id: uuid(),

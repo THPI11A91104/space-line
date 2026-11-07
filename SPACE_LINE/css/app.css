@@ -462,3 +462,46 @@ body[data-view="form"] .panel.poster {
   min-width: 0;
   overflow-wrap: anywhere;
 }
+
+/* 星を選び、近づいて一つの地点を探します。 */
+body[data-view="picker"], body[data-view="inspect"] {
+  height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible;
+  background: radial-gradient(ellipse at 80% 0%, #44230e, #160e09 65%);
+}
+body:not([data-view="space"]) > canvas,
+body:not([data-view="space"]) .labels { display: none; }
+body[data-view="picker"] #mode, body[data-view="inspect"] #mode { display:none; }
+.planet-picker { position: relative; width:100%; max-width:760px; margin:80px auto 0; padding-bottom:calc(24px + env(safe-area-inset-bottom,0px)); }
+.picker-heading, .inspect-heading { text-align:center; }
+.picker-heading small, .inspect-heading small { color:#fba267; letter-spacing:.24em; font-size:11px; }
+.picker-heading h1 { font-size:28px; margin:12px 0 0; }
+.planet-carousel { position:relative; display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; padding:12px 12%; gap:0; touch-action:pan-x pan-y; }
+.planet-carousel::-webkit-scrollbar { display:none; }
+.planet-card { flex:0 0 100%; min-width:0; scroll-snap-align:center; scroll-snap-stop:always; text-align:center; opacity:.4; transform:scale(.88); transition:opacity .25s,transform .25s; }
+.planet-card.selected { opacity:1; transform:scale(1); }
+.preview-orbit { position:relative; width:min(70vw,300px); margin:8px auto; }
+.preview-orbit img { width:100%; height:auto; display:block; }
+.with-rings:after { content:''; position:absolute; width:118%; height:27%; border:13px solid #bfa37b88; border-radius:50%; left:-9%; top:36%; transform:rotate(-25deg); pointer-events:none; }
+.planet-card span { font-size:11px; letter-spacing:.25em; color:#d9a27e; }
+.planet-card h2 { margin:7px 0; font-size:32px; }
+.planet-card p { font-size:13px; margin:8px 0; }
+.picker-controls { display:flex; align-items:center; justify-content:center; gap:35px; margin:4px 0 16px; }
+.picker-controls button { min-width:48px; min-height:44px; }
+#planet-count { font-size:12px; letter-spacing:.2em; }
+.picker-actions { display:grid; gap:8px; max-width:380px; margin:auto; padding:0 24px; }
+.quiet { background:transparent; border-color:transparent; font-size:13px; min-height:44px; }
+.planet-inspector { position:relative; width:100%; max-width:760px; margin:70px auto 0; padding-bottom:calc(18px + env(safe-area-inset-bottom,0px)); }
+.inspect-heading h1 { margin:6px 0; font-size:30px; }
+#planet-stage { height:clamp(230px,44dvh,480px); position:relative; width:100%; overflow:hidden; }
+#planet-stage canvas { touch-action:none; width:100%; height:100%; }
+.aim-guide { width:74px; height:74px; border:1px solid #fff1e51c; border-radius:50%; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; }
+.target-marker { position:absolute; width:30px; height:30px; transform:translate(-50%,-50%); border:1px solid #ff9a50; border-radius:8px; box-shadow:0 0 20px #ff812e33; pointer-events:none; }
+.target-marker:after { content:''; position:absolute; inset:12px; border-radius:50%; background:#fff0d8; }
+.target-marker.occupied { border-color:#fff0d8; }
+.inspect-actions { display:grid; gap:5px; padding:0 24px; max-width:420px; margin:auto; text-align:center; }
+#target-name { min-height:28px; font-size:16px; overflow-wrap:anywhere; }
+#planet-status { margin:0 0 8px; min-height:18px; }
+dialog .actions { display:flex; flex-direction:column; }
+dialog .actions > * { width:100%; min-height:48px; flex:auto; }
+@media(max-height:650px) { .planet-picker { margin-top:64px; } .preview-orbit { width:min(50vw,210px); } #planet-stage { height:230px; } }
+@media(prefers-reduced-motion:reduce) { .planet-card { transition:none; } }
