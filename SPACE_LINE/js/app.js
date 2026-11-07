@@ -229,11 +229,22 @@ async function enterPlanet(id) {
   try {
     const {createViewer}=await import('./planet-viewer.bundle.js?v=20261107-1');
     if(request!==viewerRequest)return;
-    planetViewer=createViewer($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · 地点 ${value.slotId.split('-')[1]}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
+    const mount=(factory)=>factory($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · 地点 ${value.slotId.split('-')[1]}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
+    try{planetViewer=mount(createViewer);}catch(error){console.warn("3D unavailable; using point selector",error);planetViewer=mount(createFlatViewer);}
     planetViewer.setRecords(records);$("find-free").disabled=false;
     $("choose-target").onclick=()=>{if(target)window.dispatchEvent(new CustomEvent('space-spot',{detail:target}));};
     $("find-free").onclick=()=>{if(!planetViewer.findFree())message('この星は満員です。別の星を選んでください。');};
   }catch(err){if(request!==viewerRequest)return;$("planet-status").textContent='読み込めませんでした。再試行してください。';$("choose-target").disabled=false;$("choose-target").textContent='再試行';$("choose-target").onclick=()=>enterPlanet(id);console.error(err);}
+}
+function createFlatViewer(host,id,onTarget,onStatus){
+  host.innerHTML=`<img src="assets/planet-preview/${id}.webp" alt="${names[id]}" style="height:75%;max-width:100%;object-fit:contain;display:block;margin:auto"><div class="picker-controls"><button id="spot-prev" aria-label="前の地点">←</button><span>地点を選択</span><button id="spot-next" aria-label="次の地点">→</button></div>`;
+  let index=0,rows=[];
+  const detail=()=>{const slotId=`${id}-${String(index+1).padStart(2,'0')}`;return {planetId:id,slotId,record:rows.find(r=>r.slotId===slotId)};};
+  const update=()=>onTarget(detail());
+  $("spot-prev").onclick=()=>{index=(index+63)%64;update();};
+  $("spot-next").onclick=()=>{index=(index+1)%64;update();};
+  onStatus('この端末では矢印で地点を選べます。');
+  return {setRecords(value){rows=value;update();},findFree(){for(let n=1;n<=64;n++){const i=(index+n)%64;if(!rows.some(r=>r.slotId===`${id}-${String(i+1).padStart(2,'0')}`)){index=i;update();return true;}}return false;},dispose(){host.replaceChildren();}};
 }
 $("back-form").onclick = registration;
 // 記録を残して次の参加者に切り替える。
