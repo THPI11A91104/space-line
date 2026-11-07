@@ -8,7 +8,7 @@
     />
     <title>SPACE LINE | 2127</title>
     <link rel="stylesheet" href="solar/style.css?v=20261031-8" />
-    <link rel="stylesheet" href="css/app.css?v=20261107-1" />
+    <link rel="stylesheet" href="css/app.css?v=20261107-3" />
   </head>
   <body data-view="form">
     <div id="app"></div>
@@ -23,15 +23,14 @@
     </header>
     <nav id="planet-nav" hidden></nav>
     <div id="guide" hidden>
-      <p>白い点をタップしてチェックイン</p>
-      <button id="back-form">入力画面</button
-      ><button id="overview">太陽系を俯瞰する</button
-      ><button id="routes" aria-pressed="false">航路を表示</button
-      ><button id="my-poster" hidden>自分のポスター</button>
+      <div class="space-target-caption"><small>LANDING POINT</small><strong id="space-target-name">星を選んで、近づこう</strong></div>
+      <button id="space-checkin" class="primary" hidden>ここにチェックイン</button>
+      <div class="space-tools"><button id="space-find-free" hidden>空き地点</button><button id="overview">俯瞰</button><button id="routes" aria-pressed="false">航路</button><button id="my-poster" hidden>ポスター</button></div>
+      <button id="back-form" class="quiet">星を選び直す</button>
     </div>
     <section id="panel" class="panel"></section>
     <dialog id="dialog"></dialog>
     <script type="module" src="js/qr-adapter.js?v=20261104-4"></script>
-    <script type="module" src="js/app.js?v=20261107-2"></script>
+    <script type="module" src="js/app.js?v=20261107-3"></script>
   </body>
 </html>

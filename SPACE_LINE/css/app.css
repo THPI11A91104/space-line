@@ -505,3 +505,74 @@ dialog .actions { display:flex; flex-direction:column; }
 dialog .actions > * { width:100%; min-height:48px; flex:auto; }
 @media(max-height:650px) { .planet-picker { margin-top:64px; } .preview-orbit { width:min(50vw,210px); } #planet-stage { height:230px; } }
 @media(prefers-reduced-motion:reduce) { .planet-card { transition:none; } }
+
+/* Destination portals */
+[hidden] { display:none !important; }
+body:not([data-view="space"]) > canvas, body:not([data-view="space"]) > .labels, body:not([data-view="space"]) > .ui { display:none !important; }
+body[data-view="space"] > canvas { position:fixed; inset:0; width:100%; height:100%; }
+body[data-view="picker"] { background:#090806; min-height:100dvh; }
+body[data-view="picker"]::before { content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 52%,#ae4d1025,transparent 55%),url('../textures/sky/milkyway.webp') center/cover;opacity:.44; }
+.planet-picker { max-width:none; min-height:calc(100dvh - 80px); margin:80px auto 0; padding-bottom:25px; position:relative; overflow:hidden; }
+.picker-heading { position:relative; z-index:2; }
+.section-code { color:#d49b71; font-size:10px; letter-spacing:.24em; }
+.picker-heading h1 { font-size:clamp(20px,3vw,30px);font-weight:500;letter-spacing:.18em;margin:10px 0; }
+.destination-stage { height:clamp(330px,52dvh,570px); position:relative; perspective:1200px; touch-action:pan-y; cursor:grab; user-select:none; -webkit-user-select:none; }
+.destination-stage.dragging { cursor:grabbing; }
+.stage-orbit {position:absolute; width:1100px;height:240px;border:1px solid #efa45d1e;border-radius:50%;top:38%;left:50%;transform:translateX(-50%) rotate(-12deg);pointer-events:none; }
+.destination-card { --offset:0;--distance:0;position:absolute;top:50%;left:50%;width:clamp(245px,32vw,400px);height:92%;padding:24px 12px;border:0;background:transparent;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transform:translate(calc(-50% + var(--offset)*86% + var(--drag,0px)),-50%) rotateY(calc(var(--offset)*-16deg)) scale(calc(1 - var(--distance)*.14));opacity:calc(1 - var(--distance)*.36);z-index:calc(5 - var(--distance));transition:transform .65s cubic-bezier(.22,.7,.15,1),opacity .5s; }
+.destination-card:hover {background:transparent;}
+.dragging .destination-card {transition:opacity .2s;}
+.portal-outline {position:absolute;inset:0 1%;clip-path:polygon(50% 0,95% 20%,95% 80%,50% 100%,5% 80%,5% 20%);background:linear-gradient(150deg,#ffd4a066,#8e411322 40%,#ff87244d);pointer-events:none;}
+.portal-outline::after {content:'';position:absolute;inset:2px;clip-path:inherit;background:linear-gradient(160deg,#23160ef5,#0c0a08f5 55%,#382010ed);}
+.destination-card.selected .portal-outline {background:linear-gradient(155deg,#ffe2b7,#ad52282b 35%,#ff9b39);filter:drop-shadow(0 0 14px #fa842a44);}
+.destination-card.selected::after {content:'';position:absolute;inset:12px 7%;border-top:1px solid #f1b27066;border-bottom:1px solid #f1b27066;clip-path:polygon(50% 0,100% 20%,100% 80%,50% 100%,0 80%,0 20%);pointer-events:none;}
+.destination-no {position:relative;color:#a88161;font-size:9px;letter-spacing:.26em;margin-top:4px;}
+.destination-world {position:relative;width:80%;aspect-ratio:1;filter:drop-shadow(14px 20px 20px #0009);margin:4px 0;}
+.destination-world img {display:block;width:100%;height:100%;object-fit:contain;pointer-events:none;}
+.destination-card.selected .destination-world {animation:planet-hover 7s ease-in-out infinite;}
+.saturn-world::after {content:'';position:absolute;left:-10%;top:30%;width:120%;height:34%;border:9px double #cab38b99;border-radius:50%;transform:rotate(-28deg);pointer-events:none;}
+.destination-en {position:relative;font-family:'PosterDisplay',Arial,sans-serif;font-size:clamp(15px,2vw,25px);letter-spacing:.06em;color:#ffe2b4;}
+.destination-card strong {position:relative;font-size:clamp(17px,2.2vw,25px);letter-spacing:.15em;font-weight:500;}
+.destination-info {text-align:center;margin:14px auto 18px;padding:0 20px;position:relative;}
+#planet-count {font-size:11px;color:#f2b273;letter-spacing:.2em;}
+#destination-copy {font-size:12px;color:#ae9987;margin:8px 0;}
+.destination-dock {display:grid;grid-template-columns:48px minmax(0,280px) 48px;gap:16px;justify-content:center;padding:0 20px;}
+.destination-dock button {border-radius:5px;min-height:50px;}
+#enter-planet {display:flex;align-items:center;justify-content:space-between;font-size:14px;letter-spacing:.12em;box-shadow:0 0 30px #ff842b24;}
+.destination-pagination {display:flex;gap:10px;justify-content:center;margin:22px 0 10px;}
+.destination-pagination button {padding:0;width:18px;height:3px;min-height:3px;border:0;background:#754c32;border-radius:0;}
+.destination-pagination button[aria-current="true"] {background:#ffd0a0;box-shadow:0 0 10px #ff812e80;}
+.gesture-hint {text-align:center;font-size:9px;letter-spacing:.16em;color:#8f7968;margin:12px 0 3px;}
+.picker-secondary {display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.picker-secondary .quiet {font-size:11px;color:#bba28d;}
+.avatars {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+.avatars label {display:flex;justify-content:center;align-items:center;padding:5px;aspect-ratio:1;border-radius:16px;}
+.avatars img {width:100%;height:auto;max-width:72px;}
+.avatars label:has(input:checked) {box-shadow:0 0 0 2px #ffae69,0 0 24px #ff812e33;}
+dialog .actions .primary {order:-1;}
+#guide {display:flex;flex-direction:column;align-items:stretch;max-width:420px;bottom:max(12px,env(safe-area-inset-bottom));background:linear-gradient(160deg,#1b130de8,#0c0908e8);border:1px solid #ffc28a26;padding:16px 18px 6px;border-radius:14px;backdrop-filter:blur(12px);gap:10px;}
+#guide button {flex:initial;min-height:40px;font-size:12px;margin:0;border-radius:6px;}
+#guide #space-checkin {background:#ff812e;color:#201108;font-size:14px;min-height:48px;}
+.space-target-caption {display:grid;gap:5px;text-align:center;padding-bottom:3px;}
+.space-target-caption small {font-size:8px;letter-spacing:.2em;color:#b48c6c;}
+.space-target-caption strong {font-size:14px;font-weight:500;letter-spacing:.07em;}
+.space-tools {display:flex;gap:6px;}
+#guide .space-tools button {flex:1;white-space:nowrap;padding:7px 8px;background:transparent;}
+#guide #back-form {background:transparent;border:0;color:#b49a85;min-height:32px;}
+.spot:not(.occupied) {background:transparent;border:1px solid #ffd2a0;box-shadow:none;border-radius:3px;width:28px;height:28px;}
+.spot.targeted:not(.occupied)::after {content:'';position:absolute;inset:10px;background:#ffb66b;border-radius:50%;}
+.spot.targeted {box-shadow:0 0 0 5px #ffae6920,0 0 24px #ff812e55;}
+@keyframes planet-hover {50% {transform:translateY(-7px);}}
+@media(max-width:600px) {
+ .planet-picker {margin-top:70px;min-height:calc(100dvh - 70px);}
+ .destination-stage {height:clamp(320px,48dvh,460px);}
+ .destination-card {width:70vw;max-width:310px;transform:translate(calc(-50% + var(--offset)*82% + var(--drag,0px)),-50%) rotateY(calc(var(--offset)*-22deg)) scale(calc(1 - var(--distance)*.18));}
+ .destination-dock {gap:10px;grid-template-columns:42px minmax(0,1fr) 42px;max-width:400px;margin:auto;}
+ #guide {max-width:360px;padding:12px 12px 4px;gap:7px;}
+ #planet-nav {top:53px;}
+ #planet-nav button {padding:8px 12px;font-size:10px;}
+}
+@media(max-height:700px) {.destination-stage {height:310px;}.destination-info {margin:6px auto 10px;}.destination-pagination {margin:14px 0 6px;}.destination-world {width:65%;}}
+@media(prefers-reduced-motion:reduce) {.destination-card {transition:none;}.destination-card.selected .destination-world {animation:none;}}
+
+@font-face {font-family:PosterDisplay;src:url("../assets/poster-display.ttf") format("truetype");font-display:swap;}

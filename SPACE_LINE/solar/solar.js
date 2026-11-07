@@ -20,7 +20,7 @@ const CONFIG = {
   },
   renderer: {
     antialias: true,
-    maxPixelRatio: 2,
+    maxPixelRatio: 1.5,
   },
   controls: {
     dampingFactor: 0.05,
@@ -270,33 +270,33 @@ const CONFIG = {
 
 const TEXTURES = {
   mercury: {
-    map: `${BASE_URL}textures/mercury/mercury.webp`,
+    map: `${BASE_URL}textures/mobile/mercury.webp`,
   },
   venus: {
-    map: `${BASE_URL}textures/venus/venus.webp`,
+    map: `${BASE_URL}textures/mobile/venus.webp`,
   },
   earth: {
     day: `${BASE_URL}textures/earth/earth_day.webp`,
     clouds: `${BASE_URL}textures/earth/earth_clouds.webp`,
   },
   moon: {
-    map: `${BASE_URL}textures/moon/moon.webp`,
+    map: `${BASE_URL}textures/mobile/moon.webp`,
   },
   mars: {
-    map: `${BASE_URL}textures/mars/mars.webp`,
+    map: `${BASE_URL}textures/mobile/mars.webp`,
   },
   jupiter: {
-    map: `${BASE_URL}textures/jupiter/jupiter.webp`,
+    map: `${BASE_URL}textures/mobile/jupiter.webp`,
   },
   saturn: {
-    map: `${BASE_URL}textures/saturn/saturn.webp`,
+    map: `${BASE_URL}textures/mobile/saturn.webp`,
     rings: `${BASE_URL}textures/saturn/saturn_ring.webp`,
   },
   uranus: {
-    map: `${BASE_URL}textures/uranus/uranus.webp`,
+    map: `${BASE_URL}textures/mobile/uranus.webp`,
   },
   neptune: {
-    map: `${BASE_URL}textures/neptune/neptune.webp`,
+    map: `${BASE_URL}textures/mobile/neptune.webp`,
   },
 };
 
@@ -447,6 +447,7 @@ function createRenderer() {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
   document.body.appendChild(renderer.domElement);
+  renderer.domElement.classList.add("solar-canvas");
 
   return renderer;
 }
@@ -951,6 +952,7 @@ function focusPlanet(name) {
     return;
   }
 
+  targetSnap=null;
   state.selectedPlanet = name;
   state.followed = name;
 
@@ -1861,8 +1863,15 @@ function installCheckinMarkers() {
     },
     focus: focusPlanet,
     overview: resetCamera,
+    findFree() {
+      const candidates=checkinMarkers.filter(m=>m.planet.name===state.followed&&!checkinRecords.some(r=>r.slotId===m.slotId));
+      if(!candidates.length)return false;
+      const index=candidates.findIndex(m=>m.slotId===activeTarget?.slotId);
+      alignMarker(candidates[(index+1)%candidates.length]);return true;
+    },
     setRecords(records) {
       checkinRecords = records;
+      targetKey="refresh";
       for (const m of checkinMarkers) {
         const record = records.find((r) => r.slotId === m.slotId);
         m.element.replaceChildren();
@@ -1884,22 +1893,50 @@ function installCheckinMarkers() {
       return renderer.domElement.toDataURL("image/png");
     },
   };
+  controls.addEventListener('start',()=>{targetSnap=null;});
+  controls.addEventListener('end',()=>{if(activeTarget&&!state.flight)alignMarker(activeTarget);});
   window.dispatchEvent(new Event("space-ready"));
 }
+let activeTarget=null,targetKey='',targetSnap=null;
+function alignMarker(marker){
+  const center=new THREE.Vector3(),point=new THREE.Vector3();
+  marker.planet.mesh.getWorldPosition(center);marker.label.getWorldPosition(point);
+  const normal=point.sub(center).normalize();
+  const distance=camera.position.distanceTo(center);
+  targetSnap={planet:marker.planet,normal:marker.planet.mesh.worldToLocal(center.clone().add(normal)).normalize(),distance};
+  if(prefersReducedMotion.matches){camera.position.copy(center).addScaledVector(normal,distance);controls.target.copy(center);targetSnap=null;}
+}
 function updateCheckinMarkers() {
-  if (!renderer) return;
-  const center = new THREE.Vector3(),
-    point = new THREE.Vector3();
-  for (const m of checkinMarkers) {
-    m.planet.mesh.getWorldPosition(center);
-    m.label.getWorldPosition(point);
-    // 裏側の地点と、遠景の空き地点を隠します。
-    const visible =
-      point.clone().sub(center).dot(camera.position.clone().sub(point)) > 0;
-    const occupied = checkinRecords.some((r) => r.slotId === m.slotId);
-    m.label.visible = visible && (state.followed === m.planet.name || occupied);
-    m.element.style.opacity = state.followed === m.planet.name ? "1" : "0.7";
-    m.element.style.transform =
-      state.followed === m.planet.name ? "scale(1)" : "scale(.55)";
+  if(!renderer)return;
+  scene.updateMatrixWorld(true);
+  if(targetSnap&&!state.flight){
+    const center=new THREE.Vector3();targetSnap.planet.mesh.getWorldPosition(center);
+    const normal=targetSnap.normal.clone().transformDirection(targetSnap.planet.mesh.matrixWorld);
+    const desired=center.clone().addScaledVector(normal,targetSnap.distance);
+    camera.position.lerp(desired,.18);controls.target.copy(center);
+    if(camera.position.distanceTo(desired)<.002)targetSnap=null;
   }
+  let candidate=null,nearest=Infinity;
+  const center=new THREE.Vector3(),point=new THREE.Vector3();
+  const occupied=new Map(checkinRecords.map(r=>[r.slotId,r]));
+  for(const m of checkinMarkers){
+    m.planet.mesh.getWorldPosition(center);m.label.getWorldPosition(point);
+    const front=point.clone().sub(center).dot(camera.position.clone().sub(point))>0;
+    m.front=front;
+    if(front&&m.planet.name===state.followed&&!state.flight){
+      const screen=point.clone().project(camera),distance=screen.x*screen.x+screen.y*screen.y;
+      if(screen.z<1&&distance<nearest){nearest=distance;candidate=m;}
+    }
+  }
+  activeTarget=candidate;
+  for(const m of checkinMarkers){
+    const isOccupied=occupied.has(m.slotId),isTarget=m===candidate;
+    m.label.visible=m.front&&(isOccupied||isTarget);
+    m.element.classList.toggle('targeted',isTarget);
+    m.element.style.opacity=isTarget?'1':'.8';
+    m.element.style.transform=state.followed===m.planet.name?'scale(1)':'scale(.6)';
+  }
+  const record=candidate?occupied.get(candidate.slotId):null;
+  const key=candidate?candidate.slotId+':'+(record?.id||''):'';
+  if(key!==targetKey){targetKey=key;window.dispatchEvent(new CustomEvent('space-target',{detail:candidate?{planetId:candidate.planet.name,slotId:candidate.slotId,record}:null}));}
 }

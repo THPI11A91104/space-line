@@ -35,6 +35,8 @@ const types = {
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".ttf": "font/ttf",
   ".txt": "text/plain; charset=utf-8",
 };
 const server = http.createServer(async (req, res) => {
@@ -86,7 +88,7 @@ const server = http.createServer(async (req, res) => {
         typeof data.username !== "string" ||
         !data.username.trim() ||
         [...data.username].length > 20 ||
-        ![1, 2, 3, 4].includes(data.avatarId) ||
+        (!Number.isInteger(data.avatarId) || data.avatarId < 1 || data.avatarId > 16) ||
         !planets.includes(data.planetId) ||
         !Array.from(
           { length: 64 },

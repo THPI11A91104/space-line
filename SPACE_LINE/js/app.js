@@ -9,6 +9,7 @@ const names = {
   uranus: "天王星",
   neptune: "海王星",
 };
+const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星"];
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
 let planetViewer = null, viewerRequest = 0;
@@ -172,12 +173,12 @@ async function ensureSolar() {
           reject(Error("3Dを表示できません。別のブラウザでお試しください。")),
         { once: true },
       );
-      import("../solar/solar.bundle.js").catch(reject);
+      import("../solar/solar.bundle.js?v=20261107-3").catch(reject);
     });
   }
   await solarLoading;
 }
-async function exploreOverview(overview = true) {
+async function exploreOverview(overview = true, planetId = selectedPlanet) {
   setView("space");
   $("panel").innerHTML = "";
   $("panel").className = "panel";
@@ -185,12 +186,12 @@ async function exploreOverview(overview = true) {
   try {
     await ensureSolar();
     if (overview) window.SpaceSolar?.overview();
-    else window.SpaceSolar?.focus("moon");
+    else window.SpaceSolar?.focus(planetId);
     renderRecords();
   } catch (err) {
-    registration();
+    enterFlatPlanet(planetId);
     if ($("loader")) $("loader").hidden = true;
-    message(err.message);
+    console.warn(err.message);
   }
 }
 const planetCopy = {
@@ -201,40 +202,52 @@ const planetCopy = {
 };
 function explore() {
   setView("picker");
-  $("panel").className = "planet-picker";
+  $("panel").className="planet-picker";
   const ids=Object.keys(names);
-  $("panel").innerHTML = `<div class="picker-heading"><small>DESTINATION</small><h1>次は、どの星へ。</h1></div>
-    <div class="planet-carousel" tabindex="0" aria-label="左右にスワイプして星を選択">${ids.map(id=>`<article class="planet-card" data-id="${id}"><div class="preview-orbit ${id==='saturn'?'with-rings':''}"><img src="assets/planet-preview/${id}.webp" alt="${names[id]}" width="240" height="240" loading="lazy"></div><span>${id.toUpperCase()}</span><h2>${names[id]}</h2><p>${planetCopy[id]}</p></article>`).join('')}</div>
-    <div class="picker-controls"><button id="previous-planet" aria-label="前の星">←</button><span id="planet-count" aria-live="polite"></span><button id="next-planet" aria-label="次の星">→</button></div>
-    <div class="picker-actions"><button id="enter-planet" class="primary">この星へ</button>${myRecord?'<button id="picker-poster" class="quiet">自分のポスターを見る</button>':''}<button id="solar-overview" class="quiet">太陽系を俯瞰する</button><button id="picker-back" class="quiet">入力画面に戻る</button></div>`;
-  const carousel=document.querySelector('.planet-carousel'), cards=[...carousel.children];
-  let index=Math.max(0,ids.indexOf(selectedPlanet));
-  function update(i){index=i;selectedPlanet=ids[i];$("planet-count").textContent=`${String(i+1).padStart(2,'0')} / ${ids.length}`;cards.forEach((c,j)=>c.classList.toggle('selected',i===j));$("previous-planet").disabled=i===0;$("next-planet").disabled=i===ids.length-1;}
-  function move(i,smooth=true){i=Math.max(0,Math.min(ids.length-1,i));update(i);const c=cards[i];carousel.scrollTo({left:c.offsetLeft-(carousel.clientWidth-c.clientWidth)/2,behavior:smooth&&!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'instant'});}
-  carousel.addEventListener('scroll',()=>{const center=carousel.scrollLeft+carousel.clientWidth/2;let best=0,dist=Infinity;cards.forEach((c,i)=>{const d=Math.abs(c.offsetLeft+c.clientWidth/2-center);if(d<dist){best=i;dist=d;}});update(best);},{passive:true});
-  carousel.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();move(index+(e.key==='ArrowRight'?1:-1));}});
+  let index=Math.max(0,ids.indexOf(selectedPlanet)),drag=null;
+  $("panel").innerHTML=`<div class="picker-heading"><span class="section-code">01 / DESTINATION</span><h1>行き先を選ぶ</h1></div>
+    <div class="destination-stage" tabindex="0" aria-label="左右にスワイプして星を選択"><div class="stage-orbit" aria-hidden="true"></div>
+    ${ids.map((id,i)=>`<button type="button" class="destination-card" data-id="${id}" aria-label="${names[id]}を選ぶ"><div class="portal-outline" aria-hidden="true"></div><span class="destination-no">SL / ${String(i+1).padStart(2,'0')}</span><div class="destination-world ${id==='saturn'?'saturn-world':''}"><img src="assets/planet-preview/${id}.webp" alt="" draggable="false" width="240" height="240"></div><span class="destination-en">${id.toUpperCase()}</span><strong>${names[id]}</strong></button>`).join('')}</div>
+    <div class="destination-info"><span id="planet-count"></span><p id="destination-copy"></p></div>
+    <div class="destination-dock"><button id="previous-planet" aria-label="前の星">←</button><button id="enter-planet" class="primary">この星へ進む <span aria-hidden="true">↗</span></button><button id="next-planet" aria-label="次の星">→</button></div>
+    <div class="destination-pagination" aria-label="星の一覧">${ids.map(id=>`<button data-jump="${id}" aria-label="${names[id]}"></button>`).join('')}</div>
+    <p class="gesture-hint">SWIPE / DRAG TO EXPLORE</p><div class="picker-secondary"><button id="solar-overview" class="quiet">宇宙を見渡す</button>${myRecord?'<button id="picker-poster" class="quiet">自分のポスター</button>':''}<button id="picker-back" class="quiet">戻る</button></div>`;
+  const stage=document.querySelector('.destination-stage'),cards=[...document.querySelectorAll('.destination-card')];
+  function move(next){index=Math.max(0,Math.min(ids.length-1,next));selectedPlanet=ids[index];
+    cards.forEach((card,i)=>{const offset=i-index;card.style.setProperty('--offset',offset);card.style.setProperty('--distance',Math.abs(offset));card.classList.toggle('selected',i===index);card.hidden=Math.abs(offset)>2;card.tabIndex=i===index?0:-1;card.setAttribute('aria-pressed',String(i===index));});
+    document.querySelectorAll('[data-jump]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.jump===selectedPlanet)));
+    $("planet-count").textContent=`${String(index+1).padStart(2,'0')} — ${String(ids.length).padStart(2,'0')}`;$("destination-copy").textContent=planetCopy[selectedPlanet];
+    $("previous-planet").disabled=index===0;$("next-planet").disabled=index===ids.length-1;
+  }
+  let suppressClick=false;
+  stage.addEventListener('pointerdown',e=>{if(e.button!==0||drag)return;drag={id:e.pointerId,x:e.clientX,y:e.clientY,card:e.target.closest("[data-id]")?.dataset.id};suppressClick=false;stage.setPointerCapture(e.pointerId);stage.classList.add('dragging');});
+  stage.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>8)suppressClick=true;stage.style.setProperty('--drag',`${Math.max(-100,Math.min(100,dx))}px`);});
+  const finish=e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y,card=drag.card;drag=null;stage.style.setProperty('--drag','0px');stage.classList.remove('dragging');if(e.type!=='pointercancel'&&Math.abs(dx)>35&&Math.abs(dx)>Math.abs(dy))move(index+(dx<0?1:-1));else if(e.type!=='pointercancel'&&Math.abs(dx)<8&&Math.abs(dy)<8&&card)move(ids.indexOf(card));};
+  stage.addEventListener('pointerup',finish);stage.addEventListener('pointercancel',finish);
+  stage.addEventListener('click',e=>{if(suppressClick){suppressClick=false;return;}const card=e.target.closest('[data-id]');if(card)move(ids.indexOf(card.dataset.id));});
+  stage.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();move(index+(e.key==='ArrowRight'?1:-1));}});
+  let lastWheel=0;stage.addEventListener('wheel',e=>{if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){e.preventDefault();if(performance.now()-lastWheel>400){move(index+(e.deltaX>0?1:-1));lastWheel=performance.now();}}},{passive:false});
+  document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>move(ids.indexOf(b.dataset.jump)));
   $("previous-planet").onclick=()=>move(index-1);$("next-planet").onclick=()=>move(index+1);
-  $("enter-planet").onclick=()=>enterPlanet(selectedPlanet);
-  $("solar-overview").onclick=()=>exploreOverview(true);
-  $("picker-back").onclick=registration;
-  if($("picker-poster"))$("picker-poster").onclick=showPoster;
-  requestAnimationFrame(()=>{if(document.body.dataset.view==='picker')move(index,false);});
+  $("enter-planet").onclick=()=>enterPlanet(selectedPlanet);$("solar-overview").onclick=()=>exploreOverview(true);
+  $("picker-back").onclick=registration;if($("picker-poster"))$("picker-poster").onclick=showPoster;move(index);
 }
-async function enterPlanet(id) {
+async function enterPlanet(id){selectedPlanet=id;await exploreOverview(false,id);}
+async function enterFlatPlanet(id) {
   selectedPlanet=id;setView("inspect");const request=viewerRequest;
   $("panel").className="planet-inspector";
   $("panel").innerHTML=`<div class="inspect-heading"><small>${id.toUpperCase()}</small><h1>${names[id]}</h1></div><div id="planet-stage"><div class="aim-guide" aria-hidden="true"></div></div><div class="inspect-actions"><p id="planet-status" class="hint" role="status">星を準備しています…</p><strong id="target-name" aria-live="polite">場所を探しています</strong><button id="choose-target" class="primary" disabled>ここにチェックイン</button><button id="find-free" class="quiet" disabled>空き地点を探す</button><button id="choose-another" class="quiet">星を選び直す</button></div>`;
   $("choose-another").onclick=explore;
   let target=null;
   try {
-    const {createViewer}=await import('./planet-viewer.bundle.js?v=20261107-1');
+    const createViewer=createFlatViewer;
     if(request!==viewerRequest)return;
     const mount=(factory)=>factory($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · 地点 ${value.slotId.split('-')[1]}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
     try{planetViewer=mount(createViewer);}catch(error){console.warn("3D unavailable; using point selector",error);planetViewer=mount(createFlatViewer);}
     planetViewer.setRecords(records);$("find-free").disabled=false;
     $("choose-target").onclick=()=>{if(target)window.dispatchEvent(new CustomEvent('space-spot',{detail:target}));};
     $("find-free").onclick=()=>{if(!planetViewer.findFree())message('この星は満員です。別の星を選んでください。');};
-  }catch(err){if(request!==viewerRequest)return;$("planet-status").textContent='読み込めませんでした。再試行してください。';$("choose-target").disabled=false;$("choose-target").textContent='再試行';$("choose-target").onclick=()=>enterPlanet(id);console.error(err);}
+  }catch(err){if(request!==viewerRequest)return;$("planet-status").textContent='読み込めませんでした。再試行してください。';$("choose-target").disabled=false;$("choose-target").textContent='再試行';$("choose-target").onclick=()=>enterFlatPlanet(id);console.error(err);}
 }
 function createFlatViewer(host,id,onTarget,onStatus){
   host.innerHTML=`<img src="assets/planet-preview/${id}.webp" alt="${names[id]}" style="height:75%;max-width:100%;object-fit:contain;display:block;margin:auto"><div class="picker-controls"><button id="spot-prev" aria-label="前の地点">←</button><span>地点を選択</span><button id="spot-next" aria-label="次の地点">→</button></div>`;
@@ -246,7 +259,16 @@ function createFlatViewer(host,id,onTarget,onStatus){
   onStatus('この端末では矢印で地点を選べます。');
   return {setRecords(value){rows=value;update();},findFree(){for(let n=1;n<=64;n++){const i=(index+n)%64;if(!rows.some(r=>r.slotId===`${id}-${String(i+1).padStart(2,'0')}`)){index=i;update();return true;}}return false;},dispose(){host.replaceChildren();}};
 }
-$("back-form").onclick = registration;
+$("back-form").onclick = explore;
+let spaceTarget=null;
+window.addEventListener('space-target',e=>{
+  spaceTarget=e.detail;const target=spaceTarget;
+  $("space-target-name").textContent=target?`${names[target.planetId]} / 地点 ${target.slotId.split('-')[1]}`:'星を選んで、近づこう';
+  $("space-checkin").hidden=!target;$("space-checkin").textContent=target?.record?'メッセージを見る':'ここにチェックイン';
+  $("space-find-free").hidden=!target;
+});
+$("space-checkin").onclick=()=>{if(spaceTarget)window.dispatchEvent(new CustomEvent('space-spot',{detail:spaceTarget}));};
+$("space-find-free").onclick=()=>{if(!window.SpaceSolar?.findFree())message('この星は満員です。別の星を選んでください。');};
 // 記録を残して次の参加者に切り替える。
 function newParticipant() {
   clientId = uuid();
@@ -260,7 +282,7 @@ function newParticipant() {
 }
 function confirmNewParticipant() {
   $("dialog").innerHTML =
-    '<h2>新しい参加者として始めますか？</h2><p>今のポスターを保存してから進んでください。これまでのチェックインは残ります。</p><div class="actions"><button id="cancel-new">戻る</button><button id="confirm-new" class="primary">新しく始める</button></div>';
+    '<h2>新しい参加者として始めますか？</h2><p>今のポスターを保存してから進んでください。これまでのチェックインは残ります。</p><div class="actions"><button id="confirm-new" class="primary">新しく始める</button><button id="cancel-new">戻る</button></div>';
   $("cancel-new").onclick = () => $("dialog").close();
   $("confirm-new").onclick = () => {
     $("dialog").close();
@@ -274,7 +296,7 @@ function registration() {
   $("panel").innerHTML =
     `<h1 class="brand-heading">SPACE LINE</h1><p class="brand-subtitle">22世紀の宇宙交通</p>
   <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="20" placeholder="例：そら" autocomplete="nickname">
-  <label>アバター *</label><div class="avatars">${[1, 2, 3, 4].map((i) => `<label><img src="assets/avatar-${i}.svg" alt="宇宙飛行士 ${i}"><input type="radio" name="avatar" value="${i}" ${i === (profile?.avatarId || 1) ? "checked" : ""}></label>`).join("")}</div>
+  <label>アバター *</label><div class="avatars">${Array.from({length:16},(_,j)=>j+1).map((i) => `<label><img src="assets/avatar-${i}.svg" alt="${avatarNames[i-1]}"><input type="radio" name="avatar" value="${i}" ${i === (profile?.avatarId || 1) ? "checked" : ""}></label>`).join("")}</div>
   <label for="region">出発地（任意）</label><input id="region" maxlength="30" placeholder="例：東京 / 大阪">
   <p class="hint">ニックネーム・アバター・メッセージは公開されます。</p>
   <div class="actions"><button id="start" class="primary">星を選ぶ</button></div></form>

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "build:solar": "esbuild solar/solar.js --bundle --format=esm --outfile=solar/solar.bundle.js",
+    "build:solar": "esbuild solar/solar.js --bundle --minify --format=esm --outfile=solar/solar.bundle.js",
     "build:viewer": "esbuild js/planet-viewer.js --bundle --minify --format=esm --outfile=js/planet-viewer.bundle.js"
   },
   "devDependencies": {
