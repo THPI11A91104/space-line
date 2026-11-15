@@ -281,7 +281,7 @@ function explore() {
     rememberRoute("picker",true);
     cards.forEach((card,i)=>{const offset=i-index;card.style.setProperty('--offset',offset);card.style.setProperty('--distance',Math.abs(offset));card.classList.toggle('selected',i===index);card.hidden=Math.abs(offset)>2;card.tabIndex=i===index?0:-1;card.setAttribute('aria-pressed',String(i===index));});
     document.querySelectorAll('[data-jump]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.jump===selectedPlanet)));
-    $("planet-count").textContent=`${String(index+1).padStart(2,'0')} — ${String(ids.length).padStart(2,'0')}`;$("destination-copy").textContent=planetCopy[selectedPlanet]+"  COORDINATES: "+coordinateText(`${selectedPlanet}-01`);
+    $("planet-count").textContent=`${String(index+1).padStart(2,'0')} — ${String(ids.length).padStart(2,'0')}`;$("destination-copy").textContent=planetCopy[selectedPlanet];
     $("previous-planet").disabled=index===0;$("next-planet").disabled=index===ids.length-1;
   }
   let suppressClick=false;
@@ -303,13 +303,13 @@ async function enterFlatPlanet(id) {
   rememberRoute("planet");
   selectedPlanet=id;setView("inspect");const request=viewerRequest;
   $("panel").className="planet-inspector";
-  $("panel").innerHTML=`<div class="inspect-heading"><small>${id.toUpperCase()}</small><h1>${names[id]}</h1></div><div id="planet-stage"><div class="aim-guide" aria-hidden="true"></div></div><div class="inspect-actions"><p id="planet-status" class="hint" role="status">星を準備しています…</p><strong id="target-name" aria-live="polite">場所を探しています</strong><button id="choose-target" class="primary" disabled>ここにチェックイン</button><button id="find-free" class="quiet" disabled>空き地点を探す</button><button id="choose-another" class="quiet">星を選び直す</button></div>`;
+  $("panel").innerHTML=`<div class="inspect-heading"><small>${id.toUpperCase()}</small><h1>${names[id]}</h1></div><div id="planet-stage"><div class="aim-guide" aria-hidden="true"></div></div><div class="inspect-actions"><p id="planet-status" class="hint" role="status">星を準備しています…</p><strong id="target-name" aria-live="polite">場所を探しています</strong><button id="choose-target" class="primary" disabled>ここにチェックイン</button><button id="find-free" class="quiet" hidden disabled>空き地点を探す</button><button id="choose-another" class="quiet">星を選び直す</button></div>`;
   $("choose-another").onclick=explore;
   let target=null;
   try {
     const createViewer=createFlatViewer;
     if(request!==viewerRequest)return;
-    const mount=(factory)=>factory($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · ${coordinateText(value.slotId)}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
+    const mount=(factory)=>factory($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · ${coordinateText(value.slotId)}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("find-free").hidden=!value?.record;$("choose-target").hidden=!!value?.record;$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
     try{planetViewer=mount(createViewer);}catch(error){console.warn("3D unavailable; using point selector",error);planetViewer=mount(createFlatViewer);}
     planetViewer.setRecords(records);$("find-free").disabled=false;
     $("choose-target").onclick=()=>{if(target)window.dispatchEvent(new CustomEvent('space-spot',{detail:target}));};
@@ -332,8 +332,8 @@ window.addEventListener('space-target',e=>{
   spaceTarget=myRecord?null:e.detail;const target=spaceTarget;
   if(myRecord){$("space-checkin").hidden=true;$("space-find-free").hidden=true;return;}
   $("space-target-name").textContent=target?`${names[target.planetId]} / ${coordinateText(target.slotId)}`:'星を選んで、近づこう';
-  $("space-checkin").hidden=!target;$("space-checkin").textContent=target?.record?'メッセージを見る':'ここにチェックイン';
-  $("space-find-free").hidden=!target;
+  $("space-checkin").hidden=!target || !!target.record;$("space-checkin").textContent='ここにチェックイン';
+  $("space-find-free").hidden=!target?.record;
 });
 $("space-checkin").onclick=()=>{if(spaceTarget)window.dispatchEvent(new CustomEvent('space-spot',{detail:spaceTarget}));};
 $("space-find-free").onclick=()=>{if(!window.SpaceSolar?.findFree())message('この星は満員です。別の星を選んでください。');};
