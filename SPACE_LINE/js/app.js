@@ -218,7 +218,7 @@ async function ensureSolar() {
           reject(Error("3Dを表示できません。別のブラウザでお試しください。")),
         { once: true },
       );
-      import("../solar/solar.bundle.js?v=20261115-83").catch(reject);
+      import("../solar/solar.bundle.js?v=20261115-84").catch(reject);
     });
   }
   await solarLoading;
@@ -562,28 +562,26 @@ async function makePoster() {
   halo.addColorStop(0,'#103e72');halo.addColorStop(.55,'#081c39');halo.addColorStop(1,'#030916');
   x.fillStyle=halo;x.fillRect(0,200,1080,1500);
   text('SPACE LINE',64,105,42,800,'#ffffff');
-  text('22世紀の宇宙交通',66,151,22,500,'#a9b0b9');
+  text('22世紀の宇宙交通',66,158,34,500,'#e1edf8');
   x.fillStyle='#dfe8ef';x.fillRect(64,192,952,1);
-  text('DESTINATION / '+String(Object.keys(names).indexOf(r.planetId)+1).padStart(2,'0'),66,252,23,500,'#8ed5ff');
   text(names[r.planetId],54,450,names[r.planetId].length>2?112:180,700,'#ffffff');
   let titleSize=80;font(titleSize,800);
   while(x.measureText(r.planetId.toUpperCase()).width>620){titleSize--;font(titleSize,800);}
   text(r.planetId.toUpperCase(),64,550,titleSize,800,'#ffffff');
-  text(coordinateText(r.slotId),68,603,25,500,'#adb9c4');
+  text(coordinateText(r.slotId),68,615,40,600,'#eef8ff');
   // 少量星光，避免影响正文和二维码
   for(let i=0;i<70;i++){
     const px=(i*173+43)%1080,py=670+(i*197)%700;
     x.fillStyle=i%5===0?'#b9cbd6':'#4b535d';
     x.fillRect(px,py,i%5===0?2:1,i%5===0?2:1);
   }
-  const artSize=r.planetId==='saturn'?1080:1040;
-  x.drawImage(art,150,645,artSize,artSize);
-  const shade=x.createLinearGradient(0,1320,0,1640);
+  const artSize=r.planetId==='saturn'?960:940;
+  x.drawImage(art,150,640,artSize,artSize);
+  const shade=x.createLinearGradient(0,1150,0,1390);
   shade.addColorStop(0,'#03091600');shade.addColorStop(1,'#030916');
-  x.fillStyle=shade;x.fillRect(0,1320,1080,400);
-  text('地球から、宇宙へ。',66,1350,36,500,'#ffffff');
+  x.fillStyle=shade;x.fillRect(0,1150,1080,830);
   let message=(r.message||'').trim().replace(/\n+/g,' ');
-  let messageSize=message.length<=18?56:43, messageLines;
+  let messageSize=message.length<=18?60:48, messageLines;
   do{
     messageLines=wrap(message,930,messageSize,500);
     if(messageLines.length<=3||messageSize<=28)break;
@@ -591,18 +589,16 @@ async function makePoster() {
   }while(true);
   messageLines.forEach((line,i)=>text(line,66,1440+i*messageSize*1.4,messageSize,500,'#ffffff'));
   x.fillStyle='#56616b';x.fillRect(64,1640,952,1);
-  text('TRAVELLER',66,1693,21,500,'#8ca1b2');
-  let nameSize=48,nameLines;
+  let nameSize=58,nameLines;
   do{nameLines=wrap(r.username,950,nameSize,600);if(nameLines.length<=2||nameSize<=28)break;nameSize--;}while(true);
-  nameLines.forEach((line,i)=>text(line,64,1757+i*nameSize*1.18,nameSize,600,'#ffffff'));
+  nameLines.forEach((line,i)=>text(line,64,1725+i*nameSize*1.18,nameSize,600,'#ffffff'));
   const details=(r.region ?? profile?.region ?? '').trim();
   if(details){
-    let detailSize=26;
+    let detailSize=38;
     font(detailSize);while(x.measureText('FROM  '+details).width>950&&detailSize>16){detailSize--;font(detailSize);}
-    text('FROM  '+details,66,1860,detailSize,400,'#c2cbd3');
+    text('FROM  '+details,66,1860,detailSize,500,'#eef5ff');
   }
-  text(voyageTime(r.createdAt)+' JST',66,1930,26,500,'#ffffff');
-  font(25,500);text(r.ticketId,1016-x.measureText(r.ticketId).width,1930,25,500,'#8ed5ff');
+  text(voyageTime(r.createdAt)+' JST',66,1930,38,500,'#ffffff');
   const qrX=736,qrY=266;
   const payload = {
     version: 1,

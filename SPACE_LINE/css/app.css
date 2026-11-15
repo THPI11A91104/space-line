@@ -658,3 +658,17 @@ button.primary:hover,.button.primary:hover{background:#249afb;color:#fff;}
 .destination-card.selected .destination-en,.destination-card.selected strong{color:#f1f9ff;}
 .destination-pagination button[aria-current="true"]{background:#91dfff;}
 #planet-nav button[aria-pressed="true"]{background:#087fe8;color:white;border-color:#70caff;}
+
+/* 宇宙页面操作区 */
+#guide{background:linear-gradient(145deg,#0b2033f5,#07111ef5);border:1px solid #87c9ff26;border-radius:20px;padding:18px;gap:14px;box-shadow:0 18px 50px #0008;}
+#guide .space-target-caption{gap:6px;padding-bottom:2px;}
+#guide .space-target-caption small{color:#a2bfd5;font-size:10px;letter-spacing:.18em;}
+#guide .space-target-caption strong{color:#f3f8ff;font-size:16px;}
+#guide .space-tools{gap:6px;padding:5px;border-radius:13px;background:#020a1466;grid-auto-rows:46px;}
+#guide .space-tools button{height:46px;max-height:46px;border:0;border-radius:9px;background:transparent;color:#dcecff;font-size:13px;font-weight:500;box-shadow:none;}
+#guide .space-tools button:hover,#guide .space-tools button[aria-pressed="true"]{background:#1a4264;color:#fff;}
+#guide #my-poster{background:#173c59;color:#e5f6ff;}
+#guide #space-checkin{background:#087fe8;color:#fff;border:1px solid #80cbff66;border-radius:12px;min-height:48px;}
+#guide #back-form,body[data-browse-only="true"] #guide #back-form{min-height:46px;border:1px solid #66b5ed4d;border-radius:12px;background:#0b2740;color:#d8efff;font-size:13px;font-weight:500;}
+#guide #back-form:hover{background:#174669;}
+@media(max-width:480px){#guide{padding:14px;gap:10px;width:calc(100% - 28px);}}
