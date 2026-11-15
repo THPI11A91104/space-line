@@ -962,7 +962,7 @@ async function upgradePlanetTexture(planet) {
   } catch { upgradedTextures.delete(name); }
 }
 function focusPlanet(name) {
-  if(browseOnly) return;
+  // 浏览时也可以切换星球
   const planet = planets.get(name);
 
   if (!planet) {

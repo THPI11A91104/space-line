@@ -1,3 +1,19 @@
+// 根据固定点位读取虚拟坐标
+const coordinates = [{"lat": 75.638, "lon": 0.0}, {"lat": 64.992, "lon": 137.508}, {"lat": 57.538, "lon": -84.984}, {"lat": 51.375, "lon": 52.523}, {"lat": 45.951, "lon": -169.969}, {"lat": 41.014, "lon": -32.461}, {"lat": 36.424, "lon": 105.047}, {"lat": 32.09, "lon": -117.446}, {"lat": 27.953, "lon": 20.062}, {"lat": 23.969, "lon": 157.57}, {"lat": 20.106, "lon": -64.922}, {"lat": 16.335, "lon": 72.585}, {"lat": 12.636, "lon": -149.907}, {"lat": 8.989, "lon": -12.399}, {"lat": 5.379, "lon": 125.109}, {"lat": 1.791, "lon": -97.384}, {"lat": -1.791, "lon": 40.124}, {"lat": -5.379, "lon": 177.632}, {"lat": -8.989, "lon": -44.86}, {"lat": -12.636, "lon": 92.648}, {"lat": -16.335, "lon": -129.845}, {"lat": -20.106, "lon": 7.663}, {"lat": -23.969, "lon": 145.171}, {"lat": -27.953, "lon": -77.321}, {"lat": -32.09, "lon": 60.186}, {"lat": -36.424, "lon": -162.306}, {"lat": -41.014, "lon": -24.798}, {"lat": -45.951, "lon": 112.71}, {"lat": -51.375, "lon": -109.783}, {"lat": -57.538, "lon": 27.725}, {"lat": -64.992, "lon": 165.233}, {"lat": -75.638, "lon": -57.259}, {"lat": 69.159, "lon": -142.244}, {"lat": -67.639, "lon": 85.148}, {"lat": -50.752, "lon": -62.95}, {"lat": 10.636, "lon": 100.738}, {"lat": 0.28, "lon": 151.452}, {"lat": 51.645, "lon": 5.854}, {"lat": 17.094, "lon": -39.697}, {"lat": -16.51, "lon": -17.399}, {"lat": -10.067, "lon": -157.834}, {"lat": -27.511, "lon": -104.192}, {"lat": -27.637, "lon": 33.315}, {"lat": 28.27, "lon": -90.411}, {"lat": 28.143, "lon": 47.096}, {"lat": -27.763, "lon": 170.823}, {"lat": 28.398, "lon": 132.081}, {"lat": 6.673, "lon": -126.491}, {"lat": -5.998, "lon": -68.113}, {"lat": 21.242, "lon": -172.469}, {"lat": -20.643, "lon": 115.373}, {"lat": 6.561, "lon": 11.017}, {"lat": -6.11, "lon": 69.394}, {"lat": 69.476, "lon": 80.248}, {"lat": -62.343, "lon": -145.008}, {"lat": -35.25, "lon": 88.766}, {"lat": 40.792, "lon": -141.126}, {"lat": 28.525, "lon": -5.427}, {"lat": 44.443, "lon": 158.688}, {"lat": 36.077, "lon": 76.63}, {"lat": -27.89, "lon": -51.669}, {"lat": -43.664, "lon": 144.216}, {"lat": -35.387, "lon": -133.727}, {"lat": 39.186, "lon": -68.54}, {"lat": -43.51, "lon": 6.708}, {"lat": 58.92, "lon": -41.933}, {"lat": -85.613, "lon": 132.935}, {"lat": -8.028, "lon": -112.974}, {"lat": 54.245, "lon": -119.255}, {"lat": 52.007, "lon": 90.839}, {"lat": -60.7, "lon": -27.562}, {"lat": -53.298, "lon": 62.158}, {"lat": 8.593, "lon": 55.877}, {"lat": 85.613, "lon": 137.508}, {"lat": -11.32, "lon": -85.248}, {"lat": 11.891, "lon": 28.152}, {"lat": 8.706, "lon": -81.63}, {"lat": -48.337, "lon": 171.941}, {"lat": 5.436, "lon": -53.905}, {"lat": -8.141, "lon": 24.534}, {"lat": -4.874, "lon": -3.191}, {"lat": -21.964, "lon": -172.042}, {"lat": 22.69, "lon": -22.562}, {"lat": -22.085, "lon": -34.534}, {"lat": 22.569, "lon": 114.946}, {"lat": 49.186, "lon": 130.963}, {"lat": -42.743, "lon": 39.169}, {"lat": 15.927, "lon": -104.62}, {"lat": 64.338, "lon": 35.388}, {"lat": -4.761, "lon": -140.699}, {"lat": -1.623, "lon": -30.916}, {"lat": 43.51, "lon": -96.266}, {"lat": -73.732, "lon": 40.287}, {"lat": 26.007, "lon": -135.272}, {"lat": -62.829, "lon": 130.008}, {"lat": -11.434, "lon": 52.259}, {"lat": 5.323, "lon": 83.603}, {"lat": 9.386, "lon": 173.323}, {"lat": 72.573, "lon": -77.321}, {"lat": -66.49, "lon": -104.883}, {"lat": 27.007, "lon": -155.334}, {"lat": 41.386, "lon": 28.843}, {"lat": 64.081, "lon": 172.896}, {"lat": 4.649, "lon": -171.351}, {"lat": -8.819, "lon": 129.581}, {"lat": -40.645, "lon": -85.939}, {"lat": 30.583, "lon": -45.551}, {"lat": -29.935, "lon": -11.545}, {"lat": -4.088, "lon": 114.255}, {"lat": 15.114, "lon": 137.935}, {"lat": -14.535, "lon": 164.969}, {"lat": 23.542, "lon": 94.884}, {"lat": -22.933, "lon": -151.98}, {"lat": -43.048, "lon": -45.815}, {"lat": 43.819, "lon": -11.281}, {"lat": 53.298, "lon": -151.716}, {"lat": -18.741, "lon": 75.248}, {"lat": -68.235, "lon": 0.163}, {"lat": 46.355, "lon": -51.405}, {"lat": 33.488, "lon": 169.278}, {"lat": -55.608, "lon": -87.748}, {"lat": -14.651, "lon": -57.523}, {"lat": 15.23, "lon": 0.427}, {"lat": -48.845, "lon": -135.536}, {"lat": -48.675, "lon": 86.957}, {"lat": -32.819, "lon": 133.626}, {"lat": -51.286, "lon": -10.427}, {"lat": 61.628, "lon": 107.974}];
+function spotCoordinates(slotId) {
+  const n = Number(String(slotId).split('-').at(-1)) - 1;
+  return coordinates[n] || coordinates[0];
+}
+function coordinateText(slotId) {
+  const {lat, lon} = spotCoordinates(slotId);
+  return `${Math.abs(lat).toFixed(3)}° ${lat < 0 ? 'S' : 'N'} / ${Math.abs(lon).toFixed(3)}° ${lon < 0 ? 'W' : 'E'}`;
+}
+function voyageTime(createdAt) {
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return '2127 —';
+  const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {timeZone:'Asia/Tokyo',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date).map(p=>[p.type,p.value]));
+  return `2127.${parts.month}.${parts.day}  ${parts.hour}:${parts.minute}`;
+}
 import { resolveRoute } from "./flow.js?v=20261107-5";
 const $ = (id) => document.getElementById(id);
 const names = {
@@ -138,7 +154,7 @@ function renderRecords() {
     const btn = document.querySelector(`[data-planet="${id}"]`);
     if (btn) {
       const free = 128 - records.filter((r) => r.planetId === id).length;
-      btn.textContent = `${name} ${free === 0 ? "満員" : "空き " + free}`;
+      btn.textContent = name;
     }
   }
 }
@@ -155,9 +171,10 @@ $("planet-nav").innerHTML = Object.entries(names)
   .map(([id, name]) => `<button data-planet="${id}">${name}</button>`)
   .join("");
 $("planet-nav").onclick = (e) => {
-  const id = e.target.dataset.planet;
+  const id = e.target.closest("[data-planet]")?.dataset.planet;
   if (id) {
-    enterPlanet(id);
+    if (myRecord) { selectedPlanet=id; window.SpaceSolar?.focus(id); }
+    else enterPlanet(id);
     document
       .querySelectorAll("[data-planet]")
       .forEach((button) =>
@@ -201,7 +218,7 @@ async function ensureSolar() {
           reject(Error("3Dを表示できません。別のブラウザでお試しください。")),
         { once: true },
       );
-      import("../solar/solar.bundle.js?v=20261107-5").catch(reject);
+      import("../solar/solar.bundle.js?v=20261115-83").catch(reject);
     });
   }
   await solarLoading;
@@ -216,7 +233,7 @@ async function exploreOverview(overview = true, planetId = selectedPlanet) {
   $("panel").className = "panel";
   $("my-poster").hidden = !myRecord;
   document.body.dataset.browseOnly=String(!!myRecord);
-  $("planet-nav").hidden=!!myRecord;
+  $("planet-nav").hidden=false;
   $("space-checkin").hidden=true;
   $("space-find-free").hidden=true;
   $("back-form").textContent=myRecord?'もう一度体験する':'星を選び直す';
@@ -264,7 +281,7 @@ function explore() {
     rememberRoute("picker",true);
     cards.forEach((card,i)=>{const offset=i-index;card.style.setProperty('--offset',offset);card.style.setProperty('--distance',Math.abs(offset));card.classList.toggle('selected',i===index);card.hidden=Math.abs(offset)>2;card.tabIndex=i===index?0:-1;card.setAttribute('aria-pressed',String(i===index));});
     document.querySelectorAll('[data-jump]').forEach(b=>b.setAttribute('aria-current',String(b.dataset.jump===selectedPlanet)));
-    $("planet-count").textContent=`${String(index+1).padStart(2,'0')} — ${String(ids.length).padStart(2,'0')}`;$("destination-copy").textContent=planetCopy[selectedPlanet];
+    $("planet-count").textContent=`${String(index+1).padStart(2,'0')} — ${String(ids.length).padStart(2,'0')}`;$("destination-copy").textContent=planetCopy[selectedPlanet]+"  COORDINATES: "+coordinateText(`${selectedPlanet}-01`);
     $("previous-planet").disabled=index===0;$("next-planet").disabled=index===ids.length-1;
   }
   let suppressClick=false;
@@ -292,7 +309,7 @@ async function enterFlatPlanet(id) {
   try {
     const createViewer=createFlatViewer;
     if(request!==viewerRequest)return;
-    const mount=(factory)=>factory($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · 地点 ${value.slotId.split('-')[1]}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
+    const mount=(factory)=>factory($("planet-stage"),id,value=>{target=value;$("target-name").textContent=value?`${names[id]} · ${coordinateText(value.slotId)}${value.record?' · '+value.record.username:''}`:'星を回して場所を探そう';$("choose-target").disabled=!value;$("choose-target").textContent=value?.record?'メッセージを見る':'ここにチェックイン';},text=>{$("planet-status").textContent=text;});
     try{planetViewer=mount(createViewer);}catch(error){console.warn("3D unavailable; using point selector",error);planetViewer=mount(createFlatViewer);}
     planetViewer.setRecords(records);$("find-free").disabled=false;
     $("choose-target").onclick=()=>{if(target)window.dispatchEvent(new CustomEvent('space-spot',{detail:target}));};
@@ -314,7 +331,7 @@ let spaceTarget=null;
 window.addEventListener('space-target',e=>{
   spaceTarget=myRecord?null:e.detail;const target=spaceTarget;
   if(myRecord){$("space-checkin").hidden=true;$("space-find-free").hidden=true;return;}
-  $("space-target-name").textContent=target?`${names[target.planetId]} / 地点 ${target.slotId.split('-')[1]}`:'星を選んで、近づこう';
+  $("space-target-name").textContent=target?`${names[target.planetId]} / ${coordinateText(target.slotId)}`:'星を選んで、近づこう';
   $("space-checkin").hidden=!target;$("space-checkin").textContent=target?.record?'メッセージを見る':'ここにチェックイン';
   $("space-find-free").hidden=!target;
 });
@@ -352,7 +369,7 @@ function registration() {
   $("panel").className = "panel";
   $("panel").innerHTML =
     `<h1 class="brand-heading">SPACE LINE</h1><p class="brand-subtitle">22世紀の宇宙交通</p>
-  <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="20" placeholder="例：そら" autocomplete="nickname">
+  <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="40" placeholder="例：そら" autocomplete="nickname">
   <label>アバター *</label><div class="avatars">${avatarIds.map((i) => `<label><img src="assets/avatar-${i}.svg" alt="${avatarNames[i-1]}"><input type="radio" name="avatar" value="${i}" ${i === (avatarIds.includes(profile?.avatarId) ? profile.avatarId : 5) ? "checked" : ""}></label>`).join("")}</div>
   <label for="region">出発地（任意）</label><input id="region" maxlength="30" placeholder="例：東京 / 大阪">
   <p class="hint">ニックネーム・アバター・メッセージは公開されます。</p>
@@ -405,7 +422,7 @@ window.addEventListener("space-spot", async (e) => {
       "チェックイン済みです。自分のポスターから旅の記録をご覧ください。",
     );
   $("dialog").innerHTML =
-    `<small>${names[planetId]} · ${escape(slotId.split("-")[1])}</small><h2>ここにチェックインしますか？</h2><div class="actions"><button id="confirm" class="primary">ここにチェックイン</button><button id="cancel">戻る</button></div><p id="error" class="error"></p>`;
+    `<small>${names[planetId]} · ${coordinateText(slotId)}</small><h2>ここにチェックインしますか？</h2><div class="actions"><button id="confirm" class="primary">ここにチェックイン</button><button id="cancel">戻る</button></div><p id="error" class="error"></p>`;
   $("cancel").onclick = () => $("dialog").close();
   $("confirm").onclick = async () => {
     $("confirm").disabled = true;
@@ -461,7 +478,7 @@ function writeMessage() {
   setView("form");
   $("panel").className = "panel";
   $("panel").innerHTML =
-    `<h1>未来へ、一言。</h1><p>${displayNames[myRecord.planetId]}の${escape(myRecord.slotId.split("-")[1])}番地点にチェックインしました。</p><form id="message-form"><label for="message">未来へのメッセージ（任意・60文字以内）</label><textarea id="message" maxlength="60" rows="4" placeholder="100年後も、この星を大切に。"></textarea><div class="actions"><button class="primary">記念ポスターをつくる</button></div><p id="save-error" class="error"></p></form>`;
+    `<h1>未来へ、一言。</h1><p>${displayNames[myRecord.planetId]}の${coordinateText(myRecord.slotId)}にチェックインしました。</p><form id="message-form"><label for="message">未来へのメッセージ（任意・60文字以内）</label><textarea id="message" maxlength="60" rows="4" placeholder="100年後も、この星を大切に。"></textarea><div class="actions"><button class="primary">記念ポスターをつくる</button></div><p id="save-error" class="error"></p></form>`;
   $("message").value = sessionStorage.getItem(key + "-message-" + myRecord.id) ?? myRecord.message ?? "";
   $("message").oninput=()=>sessionStorage.setItem(key + "-message-" + myRecord.id,$("message").value);
   $("message-form").onsubmit = async (e) => {
@@ -510,8 +527,8 @@ async function makePoster() {
   const c = document.createElement("canvas"); c.width=1080; c.height=1980;
   const x=c.getContext("2d");
   if(document.fonts?.ready)await document.fonts.ready;
-  const art=await loadImage(`assets/poster-${r.planetId}-approved.jpg`);
-  const orange="#ff7900", ink="#291307", paper="#fff0d8";
+  const art=await loadImage(`assets/planet-preview-hd/${r.planetId}.webp`);
+  const orange="#edf4fc", ink="#12376c", paper="#12376c";
   const family='"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", sans-serif';
   const font=(size,weight=400)=>{x.font=`${weight} ${size}px ${family}`;};
   const text=(value,px,py,size,weight=400,color=ink)=>{
@@ -521,70 +538,89 @@ async function makePoster() {
     ? [...new Intl.Segmenter("ja",{granularity:"grapheme"}).segment(value)].map(v=>v.segment)
     : Array.from(value);
   const wrap=(value,width,size,weight=400)=>{
-    font(size,weight);const lines=[];let line="";
-    for(const ch of graphemes(value)){
-      if(ch==="\n"){lines.push(line);line="";continue;}
-      if(line && x.measureText(line+ch).width>width){
-        // 行頭の句読点を避ける。
-        if(/^[、。，．！？!?：:；;）)」』】〉》]$/.test(ch)){
-          const parts=graphemes(line);const tail=parts.pop();
-          lines.push(parts.join(""));line=tail+ch;continue;
+    font(size,weight);
+    const lines=[];let line='';
+    // 英文按单词换行，中文和日文按字符换行
+    const tokens=value.match(/[A-Za-zÀ-ÿ0-9’'\-]+|\n|[^\S\n]+|[^]/gu)||[];
+    for(const token of tokens){
+      if(token==='\n'){lines.push(line.trimEnd());line='';continue;}
+      if(line&&x.measureText(line+token).width>width){lines.push(line.trimEnd());line='';}
+      if(!line&&!token.trim())continue;
+      if(x.measureText(token).width>width){
+        for(const ch of graphemes(token)){
+          if(line&&x.measureText(line+ch).width>width){lines.push(line);line='';}
+          line+=ch;
         }
-        const parts=graphemes(line);
-        if(/[（(「『【〈《]$/.test(line)){const tail=parts.pop();lines.push(parts.join(""));line=tail;}
-        else{lines.push(line);line="";}
-      }
-      line+=ch;
+      }else line+=token;
     }
-    if(line)lines.push(line);
+    if(line)lines.push(line.trimEnd());
     return lines;
   };
-  x.fillStyle=orange;x.fillRect(0,0,1080,1980);
-  x.save();x.beginPath();x.rect(0,0,1080,1080);x.clip();
-  x.drawImage(art,0,0,1080,art.height*1080/art.width);x.restore();
-  text(names[r.planetId],64,1186,84,700,paper);
-  text(r.planetId.toUpperCase(),66,1240,32,600,paper);
-  x.textAlign="right";
-  text(`地点 ${r.slotId.split("-").at(-1)}`,1016,1180,42,600,paper);
-  text("2127",1016,1240,32,600,paper);
-  x.textAlign="left";
-  let message=(r.message||"").trim().replace(/\n{3,}/g,"\n\n");
-  if(message.split("\n").length>4)message=message.replace(/\n+/g," ");
-  let messageSize=message.length<=18?64:54, messageLines;
+  // 星球和文字共用一张背景，不再分成色块
+  x.fillStyle='#030916';x.fillRect(0,0,1080,1980);
+  const halo=x.createRadialGradient(850,1050,60,720,1000,850);
+  halo.addColorStop(0,'#103e72');halo.addColorStop(.55,'#081c39');halo.addColorStop(1,'#030916');
+  x.fillStyle=halo;x.fillRect(0,200,1080,1500);
+  text('SPACE LINE',64,105,42,800,'#ffffff');
+  text('22世紀の宇宙交通',66,151,22,500,'#a9b0b9');
+  x.fillStyle='#dfe8ef';x.fillRect(64,192,952,1);
+  text('DESTINATION / '+String(Object.keys(names).indexOf(r.planetId)+1).padStart(2,'0'),66,252,23,500,'#8ed5ff');
+  text(names[r.planetId],54,450,names[r.planetId].length>2?112:180,700,'#ffffff');
+  let titleSize=80;font(titleSize,800);
+  while(x.measureText(r.planetId.toUpperCase()).width>620){titleSize--;font(titleSize,800);}
+  text(r.planetId.toUpperCase(),64,550,titleSize,800,'#ffffff');
+  text(coordinateText(r.slotId),68,603,25,500,'#adb9c4');
+  // 少量星光，避免影响正文和二维码
+  for(let i=0;i<70;i++){
+    const px=(i*173+43)%1080,py=670+(i*197)%700;
+    x.fillStyle=i%5===0?'#b9cbd6':'#4b535d';
+    x.fillRect(px,py,i%5===0?2:1,i%5===0?2:1);
+  }
+  const artSize=r.planetId==='saturn'?1080:1040;
+  x.drawImage(art,150,645,artSize,artSize);
+  const shade=x.createLinearGradient(0,1320,0,1640);
+  shade.addColorStop(0,'#03091600');shade.addColorStop(1,'#030916');
+  x.fillStyle=shade;x.fillRect(0,1320,1080,400);
+  text('地球から、宇宙へ。',66,1350,36,500,'#ffffff');
+  let message=(r.message||'').trim().replace(/\n+/g,' ');
+  let messageSize=message.length<=18?56:43, messageLines;
   do{
-    messageLines=wrap(message,952,messageSize,500);
-    if(messageLines.length*messageSize*1.4<=282||messageSize<=30)break;
+    messageLines=wrap(message,930,messageSize,500);
+    if(messageLines.length<=3||messageSize<=28)break;
     messageSize--;
   }while(true);
-  messageLines.forEach((line,i)=>text(line,64,1345+i*messageSize*1.4,messageSize,500));
-  x.fillStyle="#29130755";x.fillRect(64,1640,952,2);
-  let nameSize=52,nameLines;
-  do{nameLines=wrap(r.username,590,nameSize,700);if(nameLines.length<=2||nameSize<=30)break;nameSize--;}while(true);
-  nameLines.forEach((line,i)=>text(line,64,1716+i*nameSize*1.25,nameSize,700));
-  const metaY=nameLines.length>1?1840:1796;
-  text(r.ticketId,64,metaY,30,500);
-  const details=r.region ?? profile?.region ?? "";
-  let detailSize=30,detailLines;
-  do{detailLines=wrap(details,590,detailSize);if(detailLines.length<=2||detailSize<=22)break;detailSize--;}while(true);
-  detailLines.forEach((line,i)=>text(line,64,metaY+48+i*detailSize*1.3,detailSize));
-  const qrX=736,qrY=1680;
+  messageLines.forEach((line,i)=>text(line,66,1440+i*messageSize*1.4,messageSize,500,'#ffffff'));
+  x.fillStyle='#56616b';x.fillRect(64,1640,952,1);
+  text('TRAVELLER',66,1693,21,500,'#8ca1b2');
+  let nameSize=48,nameLines;
+  do{nameLines=wrap(r.username,950,nameSize,600);if(nameLines.length<=2||nameSize<=28)break;nameSize--;}while(true);
+  nameLines.forEach((line,i)=>text(line,64,1757+i*nameSize*1.18,nameSize,600,'#ffffff'));
+  const details=(r.region ?? profile?.region ?? '').trim();
+  if(details){
+    let detailSize=26;
+    font(detailSize);while(x.measureText('FROM  '+details).width>950&&detailSize>16){detailSize--;font(detailSize);}
+    text('FROM  '+details,66,1860,detailSize,400,'#c2cbd3');
+  }
+  text(voyageTime(r.createdAt)+' JST',66,1930,26,500,'#ffffff');
+  font(25,500);text(r.ticketId,1016-x.measureText(r.ticketId).width,1930,25,500,'#8ed5ff');
+  const qrX=736,qrY=266;
   const payload = {
     version: 1,
     id: r.id,
     ticketId: r.ticketId,
     username: r.username,
     avatarId: r.avatarId,
-    checkin: { planetId: r.planetId, spotId: r.slotId },
+    checkin: { planetId: r.planetId, spotId: r.slotId, ...spotCoordinates(r.slotId) },
     message: r.message,
   };
   let qr=null;
   try{
     qr=await window.SpaceLineQR.generate(payload);
     if(qr&&!/^data:image\/png;base64,/.test(qr))throw Error("QR must be PNG");
-    if(qr){const img=await loadImage(qr);x.fillStyle="#fff";x.fillRect(qrX-10,qrY-10,290,290);
+    if(qr){const img=await loadImage(qr);x.fillStyle="#fff";x.fillRect(qrX-16,qrY-16,302,302);
       x.imageSmoothingEnabled=false;x.drawImage(img,qrX,qrY,270,270);x.imageSmoothingEnabled=true;}
   }catch(err){console.error(err);qr=null;}
-  if(!qr){x.strokeStyle="#29130755";x.lineWidth=2;
+  if(!qr){x.strokeStyle="#07152955";x.lineWidth=2;
     for(const [px,py,dx,dy] of [[qrX,qrY,1,1],[qrX+270,qrY,-1,1],[qrX,qrY+270,1,-1],[qrX+270,qrY+270,-1,-1]]){
       x.beginPath();x.moveTo(px+dx*18,py);x.lineTo(px,py);x.lineTo(px,py+dy*18);x.stroke();}}
   return {url:c.toDataURL("image/png"),hasQR:!!qr};
