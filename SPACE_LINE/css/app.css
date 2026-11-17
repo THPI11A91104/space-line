@@ -677,3 +677,6 @@ body[data-browse-only="false"] #guide #routes {display:none;}
 body[data-browse-only="false"] #guide .space-tools:has(#space-find-free[hidden]) {display:none;}
 body[data-browse-only="false"] #guide #back-form {border:0;background:transparent;min-height:32px;padding:4px;color:#bdd6e8;}
 body[data-browse-only="false"] #guide .space-tools {grid-template-columns:1fr;}
+
+#previous-planet:disabled,
+#next-planet:disabled { cursor: default; }

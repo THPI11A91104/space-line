@@ -9,8 +9,8 @@ window.SpaceLineQR = {
 
     try {
       const dataUrl = await QRCode.toDataURL(textData, {
-        width: 256,
-        margin: 2,
+        scale: 8,
+        margin: 4,
         color: {
           dark: '#000000',
           light: '#ffffff'
