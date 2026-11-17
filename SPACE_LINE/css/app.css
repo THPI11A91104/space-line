@@ -680,3 +680,22 @@ body[data-browse-only="false"] #guide .space-tools {grid-template-columns:1fr;}
 
 #previous-planet:disabled,
 #next-planet:disabled { cursor: default; }
+
+body[data-view="form"]:has(.panel.poster) {
+  background: radial-gradient(ellipse at 50% 15%, #235987 0%, #112f50 48%, #081a30 100%);
+}
+body[data-view="form"] .panel.poster {
+  width: min(560px, calc(100% - 24px));
+  max-width: 560px;
+  padding: 0;
+  margin: 76px auto 36px;
+}
+.panel.poster .poster-image {
+  display: block;
+  border: 1px solid #92c4e9;
+  box-sizing: border-box;
+  box-shadow: 0 18px 60px #020e2355;
+  border-radius: 16px;
+}
+.panel.poster .poster-actions > * {font-size: 16px;min-height: 52px;}
+.panel.poster .hint {font-size: 13px;color: #e3f1ff;}
