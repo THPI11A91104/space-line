@@ -52,10 +52,6 @@ canvas {
   width: 100%;
 }
 
-/* --------------------------------------------------
-   UI
--------------------------------------------------- */
-
 .ui {
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
@@ -68,9 +64,7 @@ canvas {
   color: #fff5ee;
   left: 24px;
 
-  /* Without a scroll the panel silently clips its own controls on short
-     viewports. dvh follows the visible area on mobile, where 100vh is the
-     taller layout viewport and sits partly behind the browser chrome. */
+  
   max-height: calc(100vh - 48px);
   max-height: calc(100dvh - 48px);
   overflow-y: auto;
@@ -81,10 +75,6 @@ canvas {
   width: 280px;
   z-index: 10;
 }
-
-/* --------------------------------------------------
-   Header
--------------------------------------------------- */
 
 .ui__header {
   margin-bottom: 22px;
@@ -104,10 +94,6 @@ canvas {
   margin: 6px 0 0;
 }
 
-/* --------------------------------------------------
-   Sections
--------------------------------------------------- */
-
 .ui__section {
   border-top: 1px solid var(--color-border-subtle);
   padding: 16px 0;
@@ -124,10 +110,6 @@ canvas {
   letter-spacing: 0.12em;
   margin-bottom: 10px;
 }
-
-/* --------------------------------------------------
-   Planet list
--------------------------------------------------- */
 
 .planet-list {
   display: grid;
@@ -185,10 +167,6 @@ canvas {
   box-shadow: 0 0 8px rgb(255 161 94 / 80%);
 }
 
-/* --------------------------------------------------
-   Planet information
--------------------------------------------------- */
-
 .ui__planet-info h2 {
   font-size: 20px;
   font-weight: 600;
@@ -201,10 +179,6 @@ canvas {
   line-height: 1.55;
   margin: 0;
 }
-
-/* --------------------------------------------------
-   Speed control
--------------------------------------------------- */
 
 .speed-header {
   align-items: center;
@@ -253,10 +227,6 @@ canvas {
   width: 14px;
 }
 
-/* --------------------------------------------------
-   Actions
--------------------------------------------------- */
-
 .ui__actions {
   border-top: 1px solid var(--color-border-subtle);
   display: grid;
@@ -298,10 +268,6 @@ canvas {
   background: rgb(255 255 255 / 9%);
 }
 
-/* --------------------------------------------------
-   Accessibility
--------------------------------------------------- */
-
 @media (prefers-reduced-motion: reduce) {
   .planet-button,
   .ui-button {
@@ -309,11 +275,6 @@ canvas {
   }
 }
 
-/* --------------------------------------------------
-   Responsive
--------------------------------------------------- */
-
-/* The toggle and the summary only exist in the phone layout below. */
 .ui__toggle,
 .ui__summary {
   display: none;
@@ -344,7 +305,7 @@ canvas {
     width: auto;
   }
 
-  /* Folded, the panel is just its header: the title, the selected planet and the toggle. */
+  
   .ui[data-folded] {
     width: auto;
   }
@@ -365,10 +326,6 @@ canvas {
     margin: 2px 0 0;
   }
 }
-
-/* --------------------------------------------------
-   Loader
--------------------------------------------------- */
 
 .loader {
   align-items: center;
@@ -446,11 +403,6 @@ canvas {
   min-height: 1.4em;
 }
 
-/* --------------------------------------------------
-   Planet labels
--------------------------------------------------- */
-
-/* The layer covers the canvas but lets the orbit controls have the pointer; only the labels take clicks. */
 .labels {
   inset: 0;
   pointer-events: none;

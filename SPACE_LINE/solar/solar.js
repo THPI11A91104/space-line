@@ -28,28 +28,23 @@ const CONFIG = {
     maxDistance: 150,
   },
   picking: {
-    // How far the pointer may travel between press and release, in CSS pixels, and still count as a click
-    // rather than a drag of the orbit controls.
+
     clickTolerance: 5,
-    // A click that misses every mesh still picks a planet whose centre is this close on screen, in CSS pixels,
-    // so the small, distant planets can be clicked too.
+
     nearMiss: 14,
   },
   focus: {
-    // Camera distance when focusing a planet, as a multiple of its radius.
+
     distanceFactor: 6,
-    // Where the camera looks at a focused planet from: this many degrees around from the Sun's direction, and
-    // this many above the orbital plane.
+
     sideAngle: 40,
     elevation: 20,
     minDistance: 0.6,
-    // How close the user may then zoom in, as a multiple of the radius.
+
     clearanceFactor: 2.5,
-    // Seconds the camera takes to fly to a planet. Real time: pausing or speeding up the simulation does not
-    // change it.
+
     flightDuration: 1.2,
-    // The most of the flight one frame may cover, in seconds, so a flight spans at least a dozen frames. On a
-    // slow device, or after a long frame, an uncapped step would finish it in a frame or two.
+
     maxFlightStep: 0.1,
   },
   scene: {
@@ -59,23 +54,21 @@ const CONFIG = {
     fogFar: 300,
   },
   scale: {
-    // Scene units for Earth's radius; every planet is sized against it, so their ratios are true.
+
     earthRadius: 0.65,
-    // Scene units per square root of an AU. The square root keeps the order and the eccentricity of every orbit
-    // while bringing Neptune's 30 AU within reach of Mercury's 0.39.
+
     distance: 9,
   },
   bloom: {
     strength: 0.35,
     radius: 0.35,
-    // Only the Sun reaches the bloom pass (see renderBloom), so every bright pixel of it may bloom.
+
     threshold: 0,
-    // The glow is soft, so rendering it at half resolution looks the same and costs a quarter of the work.
+
     resolutionScale: 0.5,
   },
   sun: {
-    // Stylised: the true Sun, 109 Earth radii, would swallow the inner planets at this scale. It is still
-    // larger than Jupiter, as it should be.
+
     radius: 2.8,
     color: 0xffd27d,
     intensity: 3,
@@ -96,8 +89,7 @@ const CONFIG = {
     color: 0x427fa8,
     opacity: 0.14,
   },
-  // Sizes, orbits and tilts are the real ones (orbital elements for the J2000 epoch); CONFIG.scale turns them
-  // into scene units. Orbit and spin speeds are the stylised ones the scene has always used.
+
   planets: {
     mercury: {
       radiusKm: 2439.7,
@@ -231,7 +223,7 @@ const CONFIG = {
   },
   moon: {
     radiusKm: 1737.4,
-    // Stylised: at the true 60 Earth radii the Moon would sit far outside the view of a focused Earth.
+
     distance: 2.6,
     orbitSpeed: 1.8,
     rotationSpeed: 1.8,
@@ -239,14 +231,14 @@ const CONFIG = {
   earth: {
     shininess: 15,
     clouds: {
-      // The cloud shell sits just above the surface and turns a little faster than it.
+
       scale: 1.015,
       opacity: 0.7,
       speedFactor: 1.2,
     },
   },
   saturnRings: {
-    // In Saturn radii, so the ring scales with the planet.
+
     innerRadius: 1.24,
     outerRadius: 2.3,
     segments: 512,
@@ -255,7 +247,7 @@ const CONFIG = {
     shininess: 0,
   },
   labels: {
-    // Labels sit above their planet by this many planet radii, so they never cover it.
+
     offset: 1.6,
   },
   ambientLight: {
@@ -263,7 +255,7 @@ const CONFIG = {
     intensity: 0.22,
   },
   simulation: {
-    // Orbit and rotation speeds in this config are radians per second at 1x, scaled by this factor.
+
     timeScale: 0.1,
   },
 };
@@ -304,31 +296,26 @@ const state = {
   paused: false,
   speed: 1,
   selectedPlanet: "earth",
-  // Planet the camera is currently riding along with, if any.
+
   followed: null,
-  // The flight to a newly focused planet while it is in progress: where the camera and the target started,
-  // where the camera ends relative to the planet, and how far along it is.
+
   flight: null,
 };
 
 const prefersReducedMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)",
 );
-// The phone layout of style.css, where the panel can fold away; keep the two widths in step.
+
 const phoneLayout = window.matchMedia("(width <= 640px)");
 
-// The planets orbit around the world's Y axis, in the XZ plane.
 const ORBIT_AXIS = new THREE.Vector3(0, 1, 0);
 
-// Scratch vectors reused on every frame instead of allocated.
 const followPosition = new THREE.Vector3();
 const lastFollowPosition = new THREE.Vector3();
 const flightEnd = new THREE.Vector3();
 const scene = createScene();
 const camera = createCamera();
-// Created in init() rather than here: the WebGLRenderer constructor throws
-// when no context is available, and at module scope that would kill the
-// script before anything could tell the user why.
+
 let renderer = null;
 let controls = null;
 let labelRenderer = null;
@@ -357,8 +344,7 @@ function createLoadingManager() {
   const status = document.getElementById("loader-status");
 
   manager.onProgress = (url, loaded) => {
-    // The manager's own itemsTotal grows as dependent textures (the Moon,
-    // Saturn's rings) are queued, so the known file count is used instead.
+
     const percent = Math.round((Math.min(loaded, total) / total) * 100);
 
     bar.style.transform = `scaleX(${percent / 100})`;
@@ -397,8 +383,6 @@ function hideLoader() {
     return;
   }
 
-  // Without a fade there is no transitionend, and a loader left at opacity 0 would still be read out by screen
-  // readers, so it goes at once.
   if (prefersReducedMotion.matches) {
     loader.remove();
     return;
@@ -518,7 +502,7 @@ function createSun() {
   const light = new THREE.PointLight(0xffffff, CONFIG.sun.intensity, 0, 0);
 
   sun.layers.enable(BLOOM_LAYER);
-  // The additive halo stands in for bloom when bloom is switched off.
+
   glow.visible = false;
   sunGlow = glow;
   sun.add(glow);
@@ -538,7 +522,7 @@ function createAmbientLight() {
 }
 
 function createStars() {
-  // 遠景の銀河は内向きの球に貼り、近景の星を重ねます。
+
   new THREE.TextureLoader().load("textures/sky/milkyway.webp", (texture) => {
     texture.colorSpace = THREE.SRGBColorSpace;
     const sky = new THREE.Mesh(
@@ -558,8 +542,6 @@ function createStars() {
 
   const radius = CONFIG.stars.radius;
 
-  // Uniform over the sphere: a random longitude, and the arccosine of a uniform value for the latitude, which
-  // keeps the stars from bunching at the poles.
   for (let star = 0; star < CONFIG.stars.count; star += 1) {
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(THREE.MathUtils.randFloatSpread(2));
@@ -592,7 +574,7 @@ const EARTH_RADIUS_KM = 6371;
 
 /** A radius in kilometres in scene units, true to Earth's (and so to every other planet's). */
 function sceneRadius(radiusKm) {
-  // 展示用にサイズ差を圧縮し、小さい惑星も見やすくします。
+
   return CONFIG.scale.earthRadius * Math.sqrt(radiusKm / EARTH_RADIUS_KM);
 }
 
@@ -638,7 +620,7 @@ function orbitGeometry({
       -sinNode * sinArgument + cosNode * cosArgument * cosTilt,
       cosArgument * sinTilt,
     ),
-    // Where the planet was on 1 January 2000, so the planets start spread out as they really were.
+
     startingMeanAnomaly: THREE.MathUtils.degToRad(
       meanLongitude - perihelionLongitude,
     ),
@@ -714,9 +696,7 @@ async function createEarth(radius) {
   const clouds = createSphere(
     radius * CONFIG.earth.clouds.scale,
     new THREE.MeshPhongMaterial({
-      // Used as alphaMap rather than map: as a colour map the black areas of
-      // the texture are not transparent, they are dark, and they shade the
-      // whole planet instead of leaving the cloudless parts clear.
+
       alphaMap: cloudsTexture,
       color: 0xffffff,
       transparent: true,
@@ -726,7 +706,7 @@ async function createEarth(radius) {
   );
 
   earth.add(clouds);
-  // 地球の輪郭に、薄い青色の大気光を追加します。
+
   const atmosphere = createSphere(
     radius * 1.04,
     new THREE.ShaderMaterial({
@@ -754,7 +734,7 @@ async function createTexturedPlanet(name, config, radius) {
     map: texture,
     color: texture ? 0xffffff : config.color,
     shininess: CONFIG.planetMaterial.shininess,
-    // 岩石惑星だけに、ごく浅い凹凸を加えます。
+
     bumpMap: ["mercury", "mars"].includes(name) ? texture : null,
     bumpScale: radius * 0.009,
   });
@@ -785,9 +765,6 @@ async function createMoon(anchor) {
 
   const pivot = new THREE.Object3D();
 
-  // Attached to the anchor rather than to Earth itself: a pivot parented to
-  // the planet mesh would inherit both its axial tilt and its daily spin,
-  // which would whip the Moon around once per Earth day.
   anchor.add(pivot);
   pivot.add(moon);
 
@@ -798,7 +775,7 @@ async function createSaturnRings(saturn, radius) {
   const texture = await loadTexture(TEXTURES.saturn.rings);
   const { innerRadius, outerRadius, segments } = CONFIG.saturnRings;
   const geometry = new THREE.RingGeometry(innerRadius, outerRadius, segments);
-  // テクスチャの横方向を半径に割り当て、同心円のリングにします。
+
   const positions = geometry.attributes.position;
   const uv = geometry.attributes.uv;
   for (let i = 0; i < positions.count; i++) {
@@ -840,14 +817,8 @@ async function createPlanet(name, config) {
 
   const { mesh, clouds } = planetObject;
 
-  // The anchor carries the planet's position along the orbit and nothing
-  // else, so satellites parented to it are unaffected by tilt and spin.
   const anchor = new THREE.Object3D();
 
-  // The tilt sits on a parent of the mesh. Setting both rotation.z (tilt)
-  // and rotation.y (spin) on the same object composes them in Euler XYZ
-  // order, which spins the planet around the world axis and makes the poles
-  // precess once per rotation instead of staying tilted.
   const tiltGroup = new THREE.Object3D();
 
   if (config.axialTilt) {
@@ -875,7 +846,6 @@ async function createPlanet(name, config) {
     planet.moon = await createMoon(anchor);
   }
 
-  // Everything under the anchor (the planet, Earth's clouds and Moon, Saturn's ring) picks this planet.
   anchor.userData.planet = name;
 
   return planet;
@@ -901,7 +871,7 @@ function updateActivePlanetButton() {
     const isActive = button.dataset.planet === state.selectedPlanet;
 
     button.classList.toggle("planet-button--active", isActive);
-    // The colour alone would not tell a screen reader which planet is selected.
+
     button.setAttribute("aria-pressed", String(isActive));
   });
 }
@@ -962,7 +932,7 @@ async function upgradePlanetTexture(planet) {
   } catch { upgradedTextures.delete(name); }
 }
 function focusPlanet(name) {
-  // 浏览时也可以切换星球
+
   const planet = planets.get(name);
 
   if (!planet) {
@@ -980,8 +950,6 @@ function focusPlanet(name) {
 
   const offset = focusOffset(planet, followPosition);
 
-  // The system-wide minimum zoom distance is larger than the focus distance of every planet, so it is
-  // relaxed per planet; otherwise OrbitControls pushes the camera straight back out on the next update.
   controls.minDistance = Math.max(
     planet.radius * CONFIG.focus.clearanceFactor,
     0.5,
@@ -996,12 +964,11 @@ function focusPlanet(name) {
       fromCamera: camera.position.clone(),
       fromTarget: controls.target.clone(),
       offset,
-      // The planet keeps orbiting during the flight; the offset turns with it, so the camera still lands on
-      // the sunlit side however far the planet has gone.
+
       startAngle: orbitAngle(followPosition),
       elapsed: 0,
     };
-    // The controls would pull against the flight; they take over again when it lands.
+
     controls.enabled = false;
   }
 
@@ -1009,7 +976,6 @@ function focusPlanet(name) {
   updateActivePlanetButton();
   updateFollowUI();
 
-  // On a phone the open panel covers the planet the camera is flying to.
   if (uiElements && phoneLayout.matches) {
     setPanelFolded(true);
   }
@@ -1117,7 +1083,7 @@ function updateFollowUI() {
 const raycaster = new THREE.Raycaster();
 const pointerNdc = new THREE.Vector2();
 const projected = new THREE.Vector3();
-// Every planet's anchor, gathered once the planets exist, so hovering does not rebuild the list each frame.
+
 const pickTargets = [];
 let pointerDown = null;
 let hoverFrame = 0;
@@ -1155,7 +1121,6 @@ function planetNear(clientX, clientY, bounds) {
   for (const planet of planets.values()) {
     planet.mesh.getWorldPosition(projected).project(camera);
 
-    // Behind the camera, the projection lands on the screen mirrored; skip it.
     if (projected.z > 1) {
       continue;
     }
@@ -1218,13 +1183,10 @@ function handleHover(event) {
   });
 }
 
-// Objects on this layer glow; everything else is drawn black while the bloom is rendered.
 const BLOOM_LAYER = 1;
 const bloomLayer = new THREE.Layers();
 bloomLayer.set(BLOOM_LAYER);
 
-// Stand-ins that hide everything but the Sun from the bloom pass while still hiding the Sun where a planet
-// passes in front of it.
 const DARK_MATERIALS = {
   mesh: new THREE.MeshBasicMaterial({ color: 0x000000 }),
   points: new THREE.PointsMaterial({ color: 0x000000 }),
@@ -1395,7 +1357,7 @@ function createLabel(planet) {
     uranus: "天王星",
     neptune: "海王星",
   }[planet.name];
-  // The panel's planet list is the accessible way to pick a planet; the labels are a pointer shortcut.
+
   element.setAttribute("aria-hidden", "true");
   element.addEventListener("click", () => {
     focusPlanet(planet.name);
@@ -1594,7 +1556,6 @@ function createUI() {
     actionsMarkup(),
   ];
 
-  // Everything but the header folds away on a phone; on wider screens the panel is always open.
   ui.innerHTML = `${headerMarkup()}<div id="panel-body" class="ui__body">${body.join("")}</div>`;
   document.body.appendChild(ui);
 
@@ -1696,7 +1657,6 @@ function updatePlanetRotation(planet, delta) {
   const { config, mesh, clouds } = planet;
   const step = simulationStep(delta);
 
-  // The mean anomaly grows evenly; Kepler's equation turns it into the uneven motion along the ellipse.
   planet.meanAnomaly += config.orbitSpeed * step;
   placeOnOrbit(planet);
   if (state.followed !== planet.name)
@@ -1772,10 +1732,8 @@ async function init() {
   createStars();
   postProcessing = createPostProcessing();
 
-  // The Sun and the star field need no textures, so rendering can start
-  // immediately and the planets appear as their textures resolve.
   renderer.setAnimationLoop(animate);
-  // Listening from the start: a resize while the textures load would otherwise leave the canvas the wrong size.
+
   window.addEventListener("resize", resize);
 
   const created = await Promise.all(
@@ -1784,8 +1742,6 @@ async function init() {
     ),
   );
 
-  // Registered in the config's order, not in the order their textures happened to arrive, so the labels, the
-  // pick list, the scene graph and anything else that walks the planets sees Mercury first and Neptune last.
   for (const planet of created) {
     scene.add(planet.anchor);
     planets.set(planet.name, planet);
@@ -1794,7 +1750,7 @@ async function init() {
   addLabels();
   createUI();
   document.querySelector(".ui").style.display = "none";
-  // 月は地球の衛星として公転しながら、独立した目的地として選べます。
+
   const lunar = planets.get("earth").moon;
   const moon = {
     name: "moon",
@@ -1824,12 +1780,11 @@ init().catch((error) => {
   console.error("Failed to initialize Solar System:", error);
 });
 
-// 固定地点は惑星の子要素にして、公転・自転に追従させます。
 let showRoutes = false;
 let browseOnly = false;
 const checkinMarkers = [];
 let checkinRecords = [];
-// 既存の地点座標を保ち、空いた領域へ順に追加する。
+
 function checkinDirections() {
   const point = (i, count) => {
     const y = 1 - (2 * (i + 0.5)) / count;

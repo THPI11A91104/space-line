@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 
-// 既存の地点番号と球面上の位置を維持します。
 function directions() {
   const point=(i,n)=>{const y=1-2*(i+.5)/n,a=i*Math.PI*(3-Math.sqrt(5));return new THREE.Vector3(Math.cos(a)*Math.sqrt(1-y*y),y,Math.sin(a)*Math.sqrt(1-y*y));};
   const result=Array.from({length:32},(_,i)=>point(i,32));

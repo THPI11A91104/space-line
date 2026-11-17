@@ -3,7 +3,7 @@
 import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 
 window.SpaceLineQR = {
-  // QR生成をここに追加。PNGのData URLを返す。
+
   async generate(profile) {
     const textData = typeof profile === 'string' ? profile : JSON.stringify(profile);
 

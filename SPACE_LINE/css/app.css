@@ -220,7 +220,6 @@ a {
   }
 }
 
-/* フォーム画面のスクロール */
 [hidden] {
   display: none !important;
 }
@@ -293,7 +292,6 @@ body[data-view="form"] > canvas {
   display: none;
 }
 
-/* 生年月日 */
 .birthday-fields {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr;
@@ -344,7 +342,6 @@ body[data-view="form"] > canvas {
   color: #091c38;
 }
 
-/* クレジット */
 .credits-footer {
   margin: 30px 0 0;
   text-align: right;
@@ -364,7 +361,6 @@ body[data-view="form"] > canvas {
   text-decoration: underline;
 }
 
-/* オレンジテーマ */
 body { color: #fff3eb; }
 body[data-view="form"] {
  background: radial-gradient(ellipse at 100% 0%, #0f3670 0%, #091526 42%, #090e16 85%);
@@ -408,7 +404,6 @@ dialog { background: #0c1727; border: 1px solid #4c8ef040; border-radius: 24px; 
 .credits-footer a:hover,.credits-footer a:focus-visible { color: #9abff7; }
 @media(max-width:600px) { .panel.poster { padding: 12px; } }
 
-/* 選択肢の背景色と文字色 */
 .birthday-fields select { color-scheme: light; background: #dce9fc; color: #0c1c35; border-color: #97b7e8; }
 .birthday-fields select option { background: #dce9fc; color: #0c1c35; }
 input:autofill { color: #0c1c35; }
@@ -424,8 +419,6 @@ input:-webkit-autofill { -webkit-text-fill-color: #fff1e5; -webkit-box-shadow: 0
 body[data-view="form"] .brand-heading { font-family: Arial, sans-serif; font-size: clamp(30px, 8vw, 40px); font-weight: 500; letter-spacing: .11em; margin-bottom: 8px; color: #fff1e5; white-space: nowrap; }
 .brand-subtitle { font-size: 13px; letter-spacing: .24em; color: #80aff5; margin: 0 0 30px; }
 
-
-/* ページ全体のスクロールと端末の安全領域 */
 html {
   height: auto;
   min-height: 100%;
@@ -463,7 +456,6 @@ body[data-view="form"] .panel.poster {
   overflow-wrap: anywhere;
 }
 
-/* 星を選び、近づいて一つの地点を探します。 */
 body[data-view="picker"], body[data-view="inspect"] {
   height: auto; min-height: 100vh; min-height: 100dvh; overflow: visible;
   background: radial-gradient(ellipse at 80% 0%, #0e2444, #090e16 65%);
@@ -506,7 +498,6 @@ dialog .actions > * { width:100%; min-height:48px; flex:auto; }
 @media(max-height:650px) { .planet-picker { margin-top:64px; } .preview-orbit { width:min(50vw,210px); } #planet-stage { height:230px; } }
 @media(prefers-reduced-motion:reduce) { .planet-card { transition:none; } }
 
-/* Destination portals */
 [hidden] { display:none !important; }
 body:not([data-view="space"]) > canvas, body:not([data-view="space"]) > .labels, body:not([data-view="space"]) > .ui { display:none !important; }
 body[data-view="space"] > canvas { position:fixed; inset:0; width:100%; height:100%; }
@@ -577,7 +568,6 @@ dialog .actions .primary {order:-1;}
 
 @font-face {font-family:PosterDisplay;src:url("../assets/poster-display.ttf") format("truetype");font-display:swap;}
 
-/* Secondary actions remain visible on touch screens. */
 .picker-secondary {gap:12px;margin:22px auto 0;max-width:620px;padding:0 16px;}
 .picker-secondary .quiet {flex:1 1 145px;min-height:48px;padding:12px 18px;border:1px solid #437ed6;background:#182538;color:#d7e6fc;font-size:15px;font-weight:700;border-radius:8px;box-shadow:inset 0 1px #8eb8f640;}
 .picker-secondary .quiet:hover,.picker-secondary .quiet:focus-visible {background:#1d3f71;border-color:#71a5f4;outline:2px solid #71a5f4;outline-offset:3px;}
@@ -600,7 +590,6 @@ body[data-browse-only="true"] .spot {pointer-events:none;}
 body[data-browse-only="true"] .spot.occupied {pointer-events:auto;}
 body[data-view="space"]:has(.overview-fallback) {height:auto;overflow:auto;}
 
-/* 蓝白主题 */
 body {background:#06172f;color:#eaf3ff;}
 body[data-view="form"],body[data-view="poster"]{background:radial-gradient(ellipse at top,#153c6c,#050f24 80%);}
 #planet-nav {max-width:100%;overflow-x:auto;flex-wrap:nowrap;white-space:nowrap;z-index:20;padding-right:16px;}
@@ -608,7 +597,6 @@ body[data-view="form"],body[data-view="poster"]{background:radial-gradient(ellip
 .poster-actions>* {width:100%;box-sizing:border-box;min-height:46px;}
 .avatars img {filter:none;}
 
-/* 蓝黑背景，减少大面积渐变 */
 body,body[data-view="form"],body[data-view="poster"],body[data-view="picker"]{background:#030b1c;color:#f2f8ff;}
 body::before,body[data-view="picker"]::before{background:radial-gradient(circle at 80% 15%,#1267d61a,transparent 40%),url('../textures/sky/milkyway.webp') center/cover;opacity:.28;}
 .panel,dialog,#guide{background:#07172b;border-color:#3b98dc66;backdrop-filter:none;}
@@ -619,7 +607,6 @@ button:hover,.button:hover{border-color:#a1e9ff;}
 .hint,.section-code{color:#a9cbe7;}
 .poster-image{width:100%;height:auto;max-height:none;}
 
-/* 黑白为主，冰蓝只标记当前选择 */
 body,body[data-view="form"],body[data-view="picker"],body[data-view="poster"]{background:#050608;color:#f5f5f5;}
 body::before,body[data-view="picker"]::before{background:none;opacity:0;}
 .panel,dialog,#guide{background:#0b0d10;border-color:#ffffff30;box-shadow:none;}
@@ -648,7 +635,6 @@ body[data-browse-only="true"] #back-form{background:#f4f5f6;border-color:#fff;co
 .poster-actions button,.poster-actions a,.poster-actions .quiet{border-radius:3px!important;}
 #next-person{background:transparent!important;border-color:#ffffff55!important;color:#ddd!important;}
 
-/* 冷蓝强调色 */
 body,body[data-view="form"],body[data-view="picker"],body[data-view="poster"]{background:#030916;color:#f4f8fc;}
 body[data-view="picker"]{background:radial-gradient(ellipse at 50% 42%,#0a2540 0%,#040e20 42%,#030916 75%);}
 button.primary,.button.primary{background:#087fe8;color:#fff;border-color:#70caff;box-shadow:0 0 24px #087fe81c;}
@@ -659,7 +645,6 @@ button.primary:hover,.button.primary:hover{background:#249afb;color:#fff;}
 .destination-pagination button[aria-current="true"]{background:#91dfff;}
 #planet-nav button[aria-pressed="true"]{background:#087fe8;color:white;border-color:#70caff;}
 
-/* 宇宙页面操作区 */
 #guide{background:linear-gradient(145deg,#0b2033f5,#07111ef5);border:1px solid #87c9ff26;border-radius:20px;padding:18px;gap:14px;box-shadow:0 18px 50px #0008;}
 #guide .space-target-caption{gap:6px;padding-bottom:2px;}
 #guide .space-target-caption small{color:#a2bfd5;font-size:10px;letter-spacing:.18em;}
@@ -673,7 +658,6 @@ button.primary:hover,.button.primary:hover{background:#249afb;color:#fff;}
 #guide #back-form:hover{background:#174669;}
 @media(max-width:480px){#guide{padding:14px;gap:10px;width:calc(100% - 28px);}}
 
-/* 给星球名称留出空间，短屏也不挤出边框 */
 .destination-stage {--stage-height:clamp(400px,52dvh,570px);height:var(--stage-height);}
 .destination-card {padding:32px 12px 48px;gap:7px;}
 .destination-world {width:min(80%,calc(var(--stage-height) * .92 - 170px));flex:none;aspect-ratio:1;}
@@ -687,7 +671,7 @@ button.primary:hover,.button.primary:hover{background:#249afb;color:#fff;}
 @media(max-height:700px) {
  .destination-stage {--stage-height:350px;}
 }
-/* 打卡前只保留当前操作，完成后再显示浏览工具 */
+
 body[data-browse-only="false"] #guide #overview,
 body[data-browse-only="false"] #guide #routes {display:none;}
 body[data-browse-only="false"] #guide .space-tools:has(#space-find-free[hidden]) {display:none;}

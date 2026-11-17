@@ -61,7 +61,7 @@ const server = http.createServer(async (req, res) => {
       records: records.map(publicRecord),
     });
   if (pathname.startsWith("/api/") && req.method === "POST") {
-    // Originチェック。
+
     if (
       req.headers.origin &&
       new URL(req.headers.origin).host !== req.headers.host
@@ -99,7 +99,7 @@ const server = http.createServer(async (req, res) => {
         return json(400, { error: "入力内容を確認してください。" });
       const existing = records.find((r) => r.clientId === data.clientId);
       if (existing) return json(200, publicRecord(existing));
-      // 地点の重複確認から保存までは同期処理。
+
       if (records.some((r) => r.slotId === data.slotId))
         return json(409, {
           error: "先に他の人が選びました。別の地点を選んでください。",
@@ -147,7 +147,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method !== "GET" && req.method !== "HEAD")
     return json(405, { error: "Method not allowed" });
   const rel = pathname === "/" ? "index.html" : pathname.slice(1);
-  // 配信するファイルを制限。
+
   if (
     !/^(index\.html|ticket\.html|checkins\.html|credits\.html|(?:assets|css|js|solar|textures|licenses)\/[a-zA-Z0-9_./-]+)$/.test(
       rel,
