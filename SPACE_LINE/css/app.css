@@ -685,10 +685,10 @@ body[data-view="form"]:has(.panel.poster) {
   background: radial-gradient(ellipse at 50% 15%, #235987 0%, #112f50 48%, #081a30 100%);
 }
 body[data-view="form"] .panel.poster {
-  width: min(560px, calc(100% - 24px));
-  max-width: 560px;
+  width: min(420px, calc(100% - 24px));
+  max-width: 420px;
   padding: 0;
-  margin: 76px auto 36px;
+  margin: calc(56px + env(safe-area-inset-top)) auto calc(12px + env(safe-area-inset-bottom));
 }
 .panel.poster .poster-image {
   display: block;
@@ -699,3 +699,30 @@ body[data-view="form"] .panel.poster {
 }
 .panel.poster .poster-actions > * {font-size: 16px;min-height: 52px;}
 .panel.poster .hint {font-size: 13px;color: #e3f1ff;}
+
+.panel.poster .poster-image {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: max(240px, calc(100vh - 200px));
+  max-height: max(240px, calc(100svh - 200px - env(safe-area-inset-top) - env(safe-area-inset-bottom)));
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.panel.poster .poster-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.panel.poster .poster-actions > * {
+  grid-column: auto;
+  min-height: 40px;
+  padding: 8px 6px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.panel.poster .poster-actions #download {grid-column: 1 / -1;min-height: 44px;font-size: 15px;}
+.panel.poster .poster-actions #next-person {grid-column: auto;}
+.panel.poster .hint {margin: 8px 0 0;font-size: 11px;line-height: 16px;text-align: center;}
