@@ -635,15 +635,20 @@ body[data-browse-only="true"] #back-form{background:#f4f5f6;border-color:#fff;co
 .poster-actions button,.poster-actions a,.poster-actions .quiet{border-radius:3px!important;}
 #next-person{background:transparent!important;border-color:#ffffff55!important;color:#ddd!important;}
 
-body,body[data-view="form"],body[data-view="picker"],body[data-view="poster"]{background:#030916;color:#f4f8fc;}
+body {
+  --space-accent: #087fe8;
+  --space-accent-border: #70caff;
+  --space-text: #f4f8fc;
+}
+body,body[data-view="form"],body[data-view="picker"],body[data-view="poster"]{background:#030916;color:var(--space-text);}
 body[data-view="picker"]{background:radial-gradient(ellipse at 50% 42%,#0a2540 0%,#040e20 42%,#030916 75%);}
-button.primary,.button.primary{background:#087fe8;color:#fff;border-color:#70caff;box-shadow:0 0 24px #087fe81c;}
+button.primary,.button.primary{background:var(--space-accent);color:#fff;border-color:var(--space-accent-border);box-shadow:0 0 24px #087fe81c;}
 button.primary:hover,.button.primary:hover{background:#249afb;color:#fff;}
 .destination-card.selected .portal-outline{background:linear-gradient(155deg,#a4e2ff,#214a6a33 40%,#239ae0);}
 .destination-card.selected .portal-outline::after{background:linear-gradient(155deg,#08121f,#050b12 65%,#0a2136);}
 .destination-card.selected .destination-en,.destination-card.selected strong{color:#f1f9ff;}
 .destination-pagination button[aria-current="true"]{background:#91dfff;}
-#planet-nav button[aria-pressed="true"]{background:#087fe8;color:white;border-color:#70caff;}
+#planet-nav button[aria-pressed="true"]{background:var(--space-accent);color:white;border-color:var(--space-accent-border);}
 
 #guide{background:linear-gradient(145deg,#0b2033f5,#07111ef5);border:1px solid #87c9ff26;border-radius:20px;padding:18px;gap:14px;box-shadow:0 18px 50px #0008;}
 #guide .space-target-caption{gap:6px;padding-bottom:2px;}
@@ -682,7 +687,7 @@ body[data-browse-only="false"] #guide .space-tools {grid-template-columns:1fr;}
 #next-planet:disabled { cursor: default; }
 
 body[data-view="form"]:has(.panel.poster) {
-  background: radial-gradient(ellipse at 50% 15%, #235987 0%, #112f50 48%, #081a30 100%);
+  background: radial-gradient(ellipse at 50% 15%, #184269 0%, #0a2540 45%, #030916 90%);
 }
 body[data-view="form"] .panel.poster {
   width: min(420px, calc(100% - 24px));
@@ -726,3 +731,8 @@ body[data-view="form"] .panel.poster {
 .panel.poster .poster-actions #download {grid-column: 1 / -1;min-height: 44px;font-size: 15px;}
 .panel.poster .poster-actions #next-person {grid-column: auto;}
 .panel.poster .hint {margin: 8px 0 0;font-size: 11px;line-height: 16px;text-align: center;}
+
+#form .visit-days { display:flex; flex-wrap:wrap; gap:8px; border:0; padding:0; margin:16px 0 0; }
+#form .visit-days label { flex:1 0 135px; display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; margin:0; background:#0b192a; border:1px solid #687f97; border-radius:8px; color:var(--space-text); cursor:pointer; }
+#form .visit-days label:has(:checked) { background:#10416b; border-color:var(--space-accent-border); }
+#form .visit-days input { appearance:auto; width:16px; height:16px; min-height:0; margin:0; accent-color:var(--space-accent); }

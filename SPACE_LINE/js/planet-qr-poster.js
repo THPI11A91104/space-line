@@ -66,7 +66,7 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
   const region = layout(record.region ? '出発地  ' + record.region : '', 42, 2);
   const panelTop = 1300;
   canvas.height = panelTop + 64 + (message.height ? message.height + 52 : 0)
-    + 42 + name.height + 32 + (region.height ? region.height + 32 : 0) + 216 + 56;
+    + 42 + name.height + 32 + (region.height ? region.height + 32 : 0) + (record.visitDate ? 66 : 0) + 216 + 56;
   const text = (value, x, y, size, color = '#ffffff', weight = 500, align = 'left') => {
     setFont(size, weight);
     ctx.textAlign = align;
@@ -155,6 +155,10 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
   yText += 42;
   yText = block(name, yText, ink) + 32;
   if (region.height) yText = block(region, yText, secondary) + 32;
+  if (record.visitDate) {
+    text('来場予約日　' + record.visitDate.replaceAll('-', '.'), 80, yText + 38, 42, ink, 700);
+    yText += 66;
+  }
   text('着陸座標', 80, yText + 34, 36, secondary);
   text(coordinates, 80, yText + 94, 46, ink, 700);
   ctx.fillStyle = '#9ebed8';

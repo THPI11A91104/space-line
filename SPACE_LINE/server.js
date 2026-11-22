@@ -85,6 +85,7 @@ const server = http.createServer(async (req, res) => {
       return json(400, { error: "Invalid client" });
     if (pathname === "/api/checkin") {
       if (
+        !["2127-01-23", "2127-01-24"].includes(data.visitDate) ||
         typeof data.username !== "string" ||
         !data.username.trim() ||
         [...data.username].length > 40 ||
@@ -107,6 +108,7 @@ const server = http.createServer(async (req, res) => {
       const record = {
         id: crypto.randomUUID(),
         clientId: data.clientId,
+        visitDate: data.visitDate,
         username: data.username.trim(),
         avatarId: data.avatarId,
         region: data.region?.trim() || "",
