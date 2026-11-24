@@ -485,18 +485,28 @@ function writeMessage() {
   rememberRoute("message");
   setView("form");
   $("panel").className = "panel";
+  const planetMessages = {
+    mercury: "水星から見る太陽って大きいね。",
+    venus: "あの明るい金星まで来ちゃった！",
+    moon: "月から地球を眺めてみたかったんだ。",
+    mars: "火星って、ほんとに赤いんだね。",
+    jupiter: "木星のしま模様、ずっと見てられる。",
+    saturn: "土星の輪、近くで見るとすごい！",
+    uranus: "天王星のこの色、好きだな。",
+    neptune: "海王星まで来たよ。地球はどっちだろう。",
+  };
   const presets = [
-    "こんにちは、世界。",
-    "こんにちは、宇宙。",
-    "君に会えてうれしい。",
-    "この旅が、いつか誰かの星になりますように。",
-    "100年後も、この星を大切に。",
+    planetMessages[myRecord.planetId] ?? "宇宙まで来ちゃった！",
+    "まさかここまで来るとは！",
+    "もう少しここにいたいな。",
+    "一緒に来られてよかったね。",
+    "次はどの星に行こうかな。",
   ];
   $("panel").innerHTML = `
-    <h1>宇宙へのメッセージ</h1>
+    <h1>旅のひとこと</h1>
     <p>${displayNames[myRecord.planetId]}の${coordinateText(myRecord.slotId)}にチェックインしました。</p>
     <form id="message-form">
-      <p class="hint">例文を選ぶか、自分の言葉で書けます。</p>
+      <p class="hint">ひとこと選ぶか、自由に書いてください。</p>
       <div class="message-presets" role="group" aria-label="メッセージの例文">
         ${presets.map((line, i) => `<button type="button" data-preset="${i}" aria-pressed="false">${line}</button>`).join("")}
       </div>
