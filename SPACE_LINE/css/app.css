@@ -736,3 +736,57 @@ body[data-view="form"] .panel.poster {
 #form .visit-days label { flex:1 0 135px; display:flex; align-items:center; justify-content:center; gap:6px; min-height:44px; margin:0; background:#0b192a; border:1px solid #687f97; border-radius:8px; color:var(--space-text); cursor:pointer; }
 #form .visit-days label:has(:checked) { background:#10416b; border-color:var(--space-accent-border); }
 #form .visit-days input { appearance:auto; width:16px; height:16px; min-height:0; margin:0; accent-color:var(--space-accent); }
+
+.message-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.message-presets button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  text-align: left;
+  line-height: 1.4;
+}
+.message-presets button[aria-pressed="true"] {
+  background: #10416b;
+  border-color: var(--space-accent-border);
+}
+
+.top-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.top-brand img, .brand-heading img {
+  display: block;
+  height: auto;
+}
+.top-brand img {
+  width: clamp(116px, 25vw, 164px);
+}
+.brand-heading img {
+  width: min(100%, 295px);
+}
+.avatars label {
+  background: linear-gradient(150deg, #12243a, #080f1d);
+  border-color: #70caff38;
+}
+.avatars label:hover, .avatars label:has(input:checked) {
+  border-color: var(--space-accent-border);
+}
+.avatars label:has(input:checked)::after {
+  content: "✓";
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--space-accent);
+  color: white;
+  font-size: 12px;
+}

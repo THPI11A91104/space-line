@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="78" fill="#5d6916"/><circle cx="80" cy="80" r="70" fill="#5d6916" stroke="#c1d845" stroke-width="1"/><g fill="#b9eeb1"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#b9eeb1" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M80 24L96 55L132 60L108 85L113 123L80 107L47 123L52 85L28 60L64 55Z" fill="#a0e995"/><circle cx="65" cy="76" r="5" fill="#172b46"/><circle cx="95" cy="76" r="5" fill="#172b46"/><path d="M72 91Q80 98 88 91" fill="none"/><path d="M39 102Q77 133 125 99L131 111Q80 147 32 114Z" fill="#dbf6d7"/><path d="M112 122L126 140L136 119" fill="#c6da53"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <radialGradient id="badge" cx=".32" cy=".24" r=".8">
+      <stop stop-color="#c1d845"/>
+      <stop offset=".52" stop-color="#5d6916"/>
+      <stop offset="1" stop-color="#08172d"/>
+    </radialGradient>
+    <linearGradient id="rim" x2="1" y2="1">
+      <stop stop-color="#f0fbff"/>
+      <stop offset=".38" stop-color="#c1d845"/>
+      <stop offset="1" stop-color="#2e527d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="77" fill="url(#badge)" stroke="#07182d" stroke-width="3"/>
+  <circle cx="80" cy="80" r="72" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <circle cx="80" cy="80" r="65" fill="none" stroke="#e5f5ff" stroke-opacity=".22" stroke-dasharray="2 5"/>
+  <g fill="#b9eeb1"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#b9eeb1" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M80 24L96 55L132 60L108 85L113 123L80 107L47 123L52 85L28 60L64 55Z" fill="#a0e995"/><circle cx="65" cy="76" r="5" fill="#172b46"/><circle cx="95" cy="76" r="5" fill="#172b46"/><path d="M72 91Q80 98 88 91" fill="none"/><path d="M39 102Q77 133 125 99L131 111Q80 147 32 114Z" fill="#dbf6d7"/><path d="M112 122L126 140L136 119" fill="#c6da53"/></g></svg>

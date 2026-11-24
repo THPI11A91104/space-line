@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="78" fill="#486916"/><circle cx="80" cy="80" r="70" fill="#486916" stroke="#9dd845" stroke-width="1"/><g fill="#b1eeb8"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#b1eeb8" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M80 22Q85 53 105 59L108 39Q146 85 122 117Q107 140 78 137Q33 138 32 99Q31 76 49 58L53 81Q75 57 80 22Z" fill="#a8dc59"/><path d="M79 73Q79 93 95 95Q117 128 80 130Q45 126 66 98Z" fill="#b1efb9" stroke="none"/><circle cx="62" cy="98" r="5" fill="#172b46"/><circle cx="99" cy="98" r="5" fill="#172b46"/><path d="M72 112Q80 119 88 112" fill="none"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <radialGradient id="badge" cx=".32" cy=".24" r=".8">
+      <stop stop-color="#9dd845"/>
+      <stop offset=".52" stop-color="#486916"/>
+      <stop offset="1" stop-color="#08172d"/>
+    </radialGradient>
+    <linearGradient id="rim" x2="1" y2="1">
+      <stop stop-color="#f0fbff"/>
+      <stop offset=".38" stop-color="#9dd845"/>
+      <stop offset="1" stop-color="#2e527d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="77" fill="url(#badge)" stroke="#07182d" stroke-width="3"/>
+  <circle cx="80" cy="80" r="72" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <circle cx="80" cy="80" r="65" fill="none" stroke="#e5f5ff" stroke-opacity=".22" stroke-dasharray="2 5"/>
+  <g fill="#b1eeb8"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#b1eeb8" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M80 22Q85 53 105 59L108 39Q146 85 122 117Q107 140 78 137Q33 138 32 99Q31 76 49 58L53 81Q75 57 80 22Z" fill="#a8dc59"/><path d="M79 73Q79 93 95 95Q117 128 80 130Q45 126 66 98Z" fill="#b1efb9" stroke="none"/><circle cx="62" cy="98" r="5" fill="#172b46"/><circle cx="99" cy="98" r="5" fill="#172b46"/><path d="M72 112Q80 119 88 112" fill="none"/></g></svg>

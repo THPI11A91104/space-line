@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="78" fill="#641669"/><circle cx="80" cy="80" r="70" fill="#641669" stroke="#ce45d8" stroke-width="1"/><g fill="#eeb1c6"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#eeb1c6" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M44 92Q30 38 80 35Q130 38 116 92Q138 111 130 127Q120 139 109 119Q111 146 94 143L84 119Q77 149 63 143L57 119Q37 144 28 128Q22 116 44 92Z" fill="#e06c94"/><path d="M49 61Q54 45 68 45" stroke="#eb9fba" stroke-width="8" fill="none"/><ellipse cx="61" cy="79" rx="5" ry="8" fill="#172b46"/><ellipse cx="99" cy="79" rx="5" ry="8" fill="#172b46"/><ellipse cx="80" cy="96" rx="9" ry="7" fill="#f3c8d7"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <radialGradient id="badge" cx=".32" cy=".24" r=".8">
+      <stop stop-color="#ce45d8"/>
+      <stop offset=".52" stop-color="#641669"/>
+      <stop offset="1" stop-color="#08172d"/>
+    </radialGradient>
+    <linearGradient id="rim" x2="1" y2="1">
+      <stop stop-color="#f0fbff"/>
+      <stop offset=".38" stop-color="#ce45d8"/>
+      <stop offset="1" stop-color="#2e527d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="77" fill="url(#badge)" stroke="#07182d" stroke-width="3"/>
+  <circle cx="80" cy="80" r="72" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <circle cx="80" cy="80" r="65" fill="none" stroke="#e5f5ff" stroke-opacity=".22" stroke-dasharray="2 5"/>
+  <g fill="#eeb1c6"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#eeb1c6" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M44 92Q30 38 80 35Q130 38 116 92Q138 111 130 127Q120 139 109 119Q111 146 94 143L84 119Q77 149 63 143L57 119Q37 144 28 128Q22 116 44 92Z" fill="#e06c94"/><path d="M49 61Q54 45 68 45" stroke="#eb9fba" stroke-width="8" fill="none"/><ellipse cx="61" cy="79" rx="5" ry="8" fill="#172b46"/><ellipse cx="99" cy="79" rx="5" ry="8" fill="#172b46"/><ellipse cx="80" cy="96" rx="9" ry="7" fill="#f3c8d7"/></g></svg>

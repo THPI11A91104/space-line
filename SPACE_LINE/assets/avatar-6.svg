@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><circle cx="80" cy="80" r="78" fill="#695a16"/><circle cx="80" cy="80" r="70" fill="#695a16" stroke="#d8be45" stroke-width="1"/><g fill="#cdeeb1"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#cdeeb1" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M47 69C25 15 55 0 66 60M94 60C105 0 135 15 113 69" fill="#e5f6d7"/><path d="M49 31L57 57M111 31L103 57" stroke="#ddc65d" stroke-width="8"/><path d="M37 91Q32 53 80 53Q128 53 123 91Q125 128 80 131Q35 128 37 91Z" fill="#e5f6d7"/><ellipse cx="60" cy="86" rx="5" ry="8" fill="#172b46"/><ellipse cx="100" cy="86" rx="5" ry="8" fill="#172b46"/><path d="M75 103L80 109L85 103ZM80 109V116M69 114Q80 124 91 114" fill="#dec863"/><circle cx="46" cy="102" r="7" fill="#bbe895" stroke="none"/><circle cx="114" cy="102" r="7" fill="#bbe895" stroke="none"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160">
+  <defs>
+    <radialGradient id="badge" cx=".32" cy=".24" r=".8">
+      <stop stop-color="#d8be45"/>
+      <stop offset=".52" stop-color="#695a16"/>
+      <stop offset="1" stop-color="#08172d"/>
+    </radialGradient>
+    <linearGradient id="rim" x2="1" y2="1">
+      <stop stop-color="#f0fbff"/>
+      <stop offset=".38" stop-color="#d8be45"/>
+      <stop offset="1" stop-color="#2e527d"/>
+    </linearGradient>
+  </defs>
+  <circle cx="80" cy="80" r="77" fill="url(#badge)" stroke="#07182d" stroke-width="3"/>
+  <circle cx="80" cy="80" r="72" fill="none" stroke="url(#rim)" stroke-width="3"/>
+  <circle cx="80" cy="80" r="65" fill="none" stroke="#e5f5ff" stroke-opacity=".22" stroke-dasharray="2 5"/>
+  <g fill="#cdeeb1"><circle cx="24" cy="41" r="2"/><circle cx="134" cy="27" r="2"/><path d="M129 116v10m-5-5h10" stroke="#cdeeb1" stroke-width="2"/></g><g stroke="#172b46" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M47 69C25 15 55 0 66 60M94 60C105 0 135 15 113 69" fill="#e5f6d7"/><path d="M49 31L57 57M111 31L103 57" stroke="#ddc65d" stroke-width="8"/><path d="M37 91Q32 53 80 53Q128 53 123 91Q125 128 80 131Q35 128 37 91Z" fill="#e5f6d7"/><ellipse cx="60" cy="86" rx="5" ry="8" fill="#172b46"/><ellipse cx="100" cy="86" rx="5" ry="8" fill="#172b46"/><path d="M75 103L80 109L85 103ZM80 109V116M69 114Q80 124 91 114" fill="#dec863"/><circle cx="46" cy="102" r="7" fill="#bbe895" stroke="none"/><circle cx="114" cy="102" r="7" fill="#bbe895" stroke="none"/></g></svg>

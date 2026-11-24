@@ -41,9 +41,10 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
   const accent = THEMES[record.planetId];
   if (!accent || !qrDataUrl) throw new Error('Poster data unavailable');
   if (document.fonts?.ready) await document.fonts.ready;
-  const [planet, qr] = await Promise.all([
+  const [planet, qr, logo] = await Promise.all([
     loadImage(`assets/planet-preview-hd/${record.planetId}.webp`),
     loadImage(qrDataUrl),
+    loadImage("assets/space-line-logo.png"),
   ]);
   const canvas = document.createElement('canvas');
   canvas.width = 1080;
@@ -61,12 +62,17 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
     } while (size > 36);
     return { lines, size, weight, height: lines.length * Math.ceil(size * 1.35) };
   };
-  const message = layout(record.message, 52, 4);
-  const name = layout(record.username, 60, 3, 700);
-  const region = layout(record.region ? '出発地  ' + record.region : '', 42, 2);
+  const name = layout(record.username, 68, 3, 700);
+  const message = layout(record.message, 42, 4);
+  const region = layout(record.region ? '出発地　' + record.region : '', 38, 2);
+  const date = record.visitDate ? '来場予約日　' + record.visitDate.replaceAll('-', '.') : '';
   const panelTop = 1300;
-  canvas.height = panelTop + 64 + (message.height ? message.height + 52 : 0)
-    + 42 + name.height + 32 + (region.height ? region.height + 32 : 0) + (record.visitDate ? 66 : 0) + 216 + 56;
+  const padding = 48;
+  const nameTop = panelTop + padding + 46;
+  const timeTop = nameTop + name.height + 24;
+  const detailTop = timeTop + 196;
+  const messageTop = detailTop + (region.height ? region.height + 12 : 0) + (date ? 52 : 0);
+  canvas.height = messageTop + (message.height ? 78 + message.height : 0) + padding;
   const text = (value, x, y, size, color = '#ffffff', weight = 500, align = 'left') => {
     setFont(size, weight);
     ctx.textAlign = align;
@@ -109,7 +115,8 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
   sceneCtx.fillRect(0, 0, 1080, 1200);
   ctx.drawImage(scene, 0, 0);
 
-  text('SPACE LINE', 80, 104, 50, '#ffffff', 700);
+  const logoWidth = 400;
+  ctx.drawImage(logo, 80, 67, logoWidth, logoWidth * logo.naturalHeight / logo.naturalWidth);
   text('22世紀の宇宙交通', 80, 158, 36, '#e4f4ff');
   ctx.fillStyle = '#b6e3ff88';
   ctx.fillRect(80, 195, 920, 2);
@@ -144,25 +151,20 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
   ctx.fillRect(0, panelTop, 1080, 8);
   const ink = '#0a2b50';
   const secondary = '#305778';
-  let yText = panelTop + 64;
+  const highlight = '#075a99';
+  text('お名前', 80, nameTop - 12, 32, secondary, 600);
+  block(name, nameTop, ink);
+  text('チェックイン日時', 80, timeTop + 29, 32, secondary, 600);
+  text(`${voyageDate} JST`, 80, timeTop + 85, 49, highlight, 700);
+  text('着陸座標', 80, timeTop + 128, 32, secondary, 600);
+  text(coordinates, 80, timeTop + 175, 43, ink, 700);
+  if (region.height) block(region, detailTop, secondary);
+  if (date) text(date, 80, messageTop - 14, 38, secondary, 500);
   if (message.height) {
-    yText = block(message, yText, ink) + 26;
     ctx.fillStyle = '#9ebed8';
-    ctx.fillRect(80, yText, 920, 2);
-    yText += 26;
+    ctx.fillRect(80, messageTop + 20, 920, 2);
+    text('宇宙へのメッセージ', 80, messageTop + 62, 32, secondary, 600);
+    block(message, messageTop + 78, ink);
   }
-  text('お名前', 80, yText + 30, 34, secondary);
-  yText += 42;
-  yText = block(name, yText, ink) + 32;
-  if (region.height) yText = block(region, yText, secondary) + 32;
-  if (record.visitDate) {
-    text('来場予約日　' + record.visitDate.replaceAll('-', '.'), 80, yText + 38, 42, ink, 700);
-    yText += 66;
-  }
-  text('着陸座標', 80, yText + 34, 36, secondary);
-  text(coordinates, 80, yText + 94, 46, ink, 700);
-  ctx.fillStyle = '#9ebed8';
-  ctx.fillRect(80, yText + 128, 920, 2);
-  text(`${voyageDate} JST`, 80, yText + 199, 42, ink, 600);
   return { url: canvas.toDataURL('image/png'), hasQR: true };
 }

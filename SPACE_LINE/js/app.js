@@ -1,4 +1,4 @@
-import { createPlanetQrPoster } from "./planet-qr-poster.js?v=89";
+import { createPlanetQrPoster } from "./planet-qr-poster.js?v=91";
 
 const coordinates = [{"lat": 75.638, "lon": 0.0}, {"lat": 64.992, "lon": 137.508}, {"lat": 57.538, "lon": -84.984}, {"lat": 51.375, "lon": 52.523}, {"lat": 45.951, "lon": -169.969}, {"lat": 41.014, "lon": -32.461}, {"lat": 36.424, "lon": 105.047}, {"lat": 32.09, "lon": -117.446}, {"lat": 27.953, "lon": 20.062}, {"lat": 23.969, "lon": 157.57}, {"lat": 20.106, "lon": -64.922}, {"lat": 16.335, "lon": 72.585}, {"lat": 12.636, "lon": -149.907}, {"lat": 8.989, "lon": -12.399}, {"lat": 5.379, "lon": 125.109}, {"lat": 1.791, "lon": -97.384}, {"lat": -1.791, "lon": 40.124}, {"lat": -5.379, "lon": 177.632}, {"lat": -8.989, "lon": -44.86}, {"lat": -12.636, "lon": 92.648}, {"lat": -16.335, "lon": -129.845}, {"lat": -20.106, "lon": 7.663}, {"lat": -23.969, "lon": 145.171}, {"lat": -27.953, "lon": -77.321}, {"lat": -32.09, "lon": 60.186}, {"lat": -36.424, "lon": -162.306}, {"lat": -41.014, "lon": -24.798}, {"lat": -45.951, "lon": 112.71}, {"lat": -51.375, "lon": -109.783}, {"lat": -57.538, "lon": 27.725}, {"lat": -64.992, "lon": 165.233}, {"lat": -75.638, "lon": -57.259}, {"lat": 69.159, "lon": -142.244}, {"lat": -67.639, "lon": 85.148}, {"lat": -50.752, "lon": -62.95}, {"lat": 10.636, "lon": 100.738}, {"lat": 0.28, "lon": 151.452}, {"lat": 51.645, "lon": 5.854}, {"lat": 17.094, "lon": -39.697}, {"lat": -16.51, "lon": -17.399}, {"lat": -10.067, "lon": -157.834}, {"lat": -27.511, "lon": -104.192}, {"lat": -27.637, "lon": 33.315}, {"lat": 28.27, "lon": -90.411}, {"lat": 28.143, "lon": 47.096}, {"lat": -27.763, "lon": 170.823}, {"lat": 28.398, "lon": 132.081}, {"lat": 6.673, "lon": -126.491}, {"lat": -5.998, "lon": -68.113}, {"lat": 21.242, "lon": -172.469}, {"lat": -20.643, "lon": 115.373}, {"lat": 6.561, "lon": 11.017}, {"lat": -6.11, "lon": 69.394}, {"lat": 69.476, "lon": 80.248}, {"lat": -62.343, "lon": -145.008}, {"lat": -35.25, "lon": 88.766}, {"lat": 40.792, "lon": -141.126}, {"lat": 28.525, "lon": -5.427}, {"lat": 44.443, "lon": 158.688}, {"lat": 36.077, "lon": 76.63}, {"lat": -27.89, "lon": -51.669}, {"lat": -43.664, "lon": 144.216}, {"lat": -35.387, "lon": -133.727}, {"lat": 39.186, "lon": -68.54}, {"lat": -43.51, "lon": 6.708}, {"lat": 58.92, "lon": -41.933}, {"lat": -85.613, "lon": 132.935}, {"lat": -8.028, "lon": -112.974}, {"lat": 54.245, "lon": -119.255}, {"lat": 52.007, "lon": 90.839}, {"lat": -60.7, "lon": -27.562}, {"lat": -53.298, "lon": 62.158}, {"lat": 8.593, "lon": 55.877}, {"lat": 85.613, "lon": 137.508}, {"lat": -11.32, "lon": -85.248}, {"lat": 11.891, "lon": 28.152}, {"lat": 8.706, "lon": -81.63}, {"lat": -48.337, "lon": 171.941}, {"lat": 5.436, "lon": -53.905}, {"lat": -8.141, "lon": 24.534}, {"lat": -4.874, "lon": -3.191}, {"lat": -21.964, "lon": -172.042}, {"lat": 22.69, "lon": -22.562}, {"lat": -22.085, "lon": -34.534}, {"lat": 22.569, "lon": 114.946}, {"lat": 49.186, "lon": 130.963}, {"lat": -42.743, "lon": 39.169}, {"lat": 15.927, "lon": -104.62}, {"lat": 64.338, "lon": 35.388}, {"lat": -4.761, "lon": -140.699}, {"lat": -1.623, "lon": -30.916}, {"lat": 43.51, "lon": -96.266}, {"lat": -73.732, "lon": 40.287}, {"lat": 26.007, "lon": -135.272}, {"lat": -62.829, "lon": 130.008}, {"lat": -11.434, "lon": 52.259}, {"lat": 5.323, "lon": 83.603}, {"lat": 9.386, "lon": 173.323}, {"lat": 72.573, "lon": -77.321}, {"lat": -66.49, "lon": -104.883}, {"lat": 27.007, "lon": -155.334}, {"lat": 41.386, "lon": 28.843}, {"lat": 64.081, "lon": 172.896}, {"lat": 4.649, "lon": -171.351}, {"lat": -8.819, "lon": 129.581}, {"lat": -40.645, "lon": -85.939}, {"lat": 30.583, "lon": -45.551}, {"lat": -29.935, "lon": -11.545}, {"lat": -4.088, "lon": 114.255}, {"lat": 15.114, "lon": 137.935}, {"lat": -14.535, "lon": 164.969}, {"lat": 23.542, "lon": 94.884}, {"lat": -22.933, "lon": -151.98}, {"lat": -43.048, "lon": -45.815}, {"lat": 43.819, "lon": -11.281}, {"lat": 53.298, "lon": -151.716}, {"lat": -18.741, "lon": 75.248}, {"lat": -68.235, "lon": 0.163}, {"lat": 46.355, "lon": -51.405}, {"lat": 33.488, "lon": 169.278}, {"lat": -55.608, "lon": -87.748}, {"lat": -14.651, "lon": -57.523}, {"lat": 15.23, "lon": 0.427}, {"lat": -48.845, "lon": -135.536}, {"lat": -48.675, "lon": 86.957}, {"lat": -32.819, "lon": 133.626}, {"lat": -51.286, "lon": -10.427}, {"lat": 61.628, "lon": 107.974}];
 function spotCoordinates(slotId) {
@@ -370,7 +370,7 @@ function registration() {
   setView("form");
   $("panel").className = "panel";
   $("panel").innerHTML =
-    `<h1 class="brand-heading">SPACE LINE</h1><p class="brand-subtitle">22世紀の宇宙交通</p>
+    `<h1 class="brand-heading"><img src="assets/space-line-logo.png" width="2040" height="186" alt="SPACE LINE"></h1><p class="brand-subtitle">22世紀の宇宙交通</p>
   <form id="form"><label for="nickname">ニックネーム *</label><input id="nickname" required maxlength="40" placeholder="例：そら" autocomplete="nickname">
   <fieldset class="visit-days"><legend>来場予約日 *</legend>
     ${visitDates.map(date => `<label><input type="radio" name="visitDate" value="${date}" required ${profile?.visitDate === date ? "checked" : ""}>2127年1月${date.slice(-2)}日</label>`).join("")}
@@ -485,13 +485,53 @@ function writeMessage() {
   rememberRoute("message");
   setView("form");
   $("panel").className = "panel";
-  $("panel").innerHTML =
-    `<h1>未来へ、一言。</h1><p>${displayNames[myRecord.planetId]}の${coordinateText(myRecord.slotId)}にチェックインしました。</p><form id="message-form"><label for="message">未来へのメッセージ（任意・60文字以内）</label><textarea id="message" maxlength="60" rows="4" placeholder="100年後も、この星を大切に。"></textarea><div class="actions"><button class="primary">記念ポスターをつくる</button></div><p id="save-error" class="error"></p></form>`;
-  $("message").value = sessionStorage.getItem(key + "-message-" + myRecord.id) ?? myRecord.message ?? "";
-  $("message").oninput=()=>sessionStorage.setItem(key + "-message-" + myRecord.id,$("message").value);
+  const presets = [
+    "こんにちは、世界。",
+    "こんにちは、宇宙。",
+    "君に会えてうれしい。",
+    "この旅が、いつか誰かの星になりますように。",
+    "100年後も、この星を大切に。",
+  ];
+  $("panel").innerHTML = `
+    <h1>宇宙へのメッセージ</h1>
+    <p>${displayNames[myRecord.planetId]}の${coordinateText(myRecord.slotId)}にチェックインしました。</p>
+    <form id="message-form">
+      <p class="hint">例文を選ぶか、自分の言葉で書けます。</p>
+      <div class="message-presets" role="group" aria-label="メッセージの例文">
+        ${presets.map((line, i) => `<button type="button" data-preset="${i}" aria-pressed="false">${line}</button>`).join("")}
+      </div>
+      <label for="message">メッセージ（任意・60文字以内）</label>
+      <textarea id="message" maxlength="60" rows="3" placeholder="ここに入力"></textarea>
+      <div class="actions"><button type="submit" id="create-poster" class="primary"></button></div>
+      <p id="save-error" class="error" role="alert"></p>
+    </form>`;
+  const messageInput = $("message");
+  const posterButton = $("create-poster");
+  const draftKey = key + "-message-" + myRecord.id;
+  const presetButtons = $("message-form").querySelectorAll("[data-preset]");
+  messageInput.value = sessionStorage.getItem(draftKey) ?? myRecord.message ?? "";
+  function updateMessageControls() {
+    const current = messageInput.value;
+    for (const preset of presetButtons) {
+      preset.setAttribute("aria-pressed", String(current === presets[preset.dataset.preset]));
+    }
+    posterButton.textContent = current.trim() ? "記念ポスターをつくる" : "メッセージなしでポスターをつくる";
+  }
+  messageInput.oninput = () => {
+    sessionStorage.setItem(draftKey, messageInput.value);
+    updateMessageControls();
+  };
+  for (const preset of presetButtons) {
+    preset.onclick = () => {
+      const selected = presets[preset.dataset.preset];
+      messageInput.value = messageInput.value === selected ? "" : selected;
+      messageInput.oninput();
+    };
+  }
+  updateMessageControls();
   $("message-form").onsubmit = async (e) => {
     e.preventDefault();
-    const button = e.target.querySelector("button");
+    const button = posterButton;
     button.disabled = true;
     try {
       const text = $("message").value.trim();
