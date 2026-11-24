@@ -89,7 +89,7 @@ const server = http.createServer(async (req, res) => {
         typeof data.username !== "string" ||
         !data.username.trim() ||
         [...data.username].length > 40 ||
-        (!Number.isInteger(data.avatarId) || data.avatarId < 1 || data.avatarId > 41) ||
+        (!Number.isInteger(data.avatarId) || data.avatarId < 1 || data.avatarId > 57) ||
         (data.region !== undefined && (typeof data.region !== "string" || [...data.region].length > 30)) ||
         !planets.includes(data.planetId) ||
         !Array.from(
