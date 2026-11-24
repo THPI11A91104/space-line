@@ -27,11 +27,11 @@ const names = {
   uranus: "天王星",
   neptune: "海王星",
 };
-const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星","星くま","月のフクロウ","宇宙クジラ","探査ドローン","星の旅人"];
-const avatarIds=Array.from({length:17},(_,i)=>i+5);
+const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星","星くま","月のフクロウ","宇宙クジラ","探査ドローン","星の旅人","ロケット", "おやすみの月", "月面ローバー", "人工衛星", "搭乗券", "銀河カタツムリ", "太陽", "空飛ぶ円盤", "輪っかの土星", "流星", "宇宙グローブ", "オーロラ", "望遠鏡", "居眠り隕石", "星くじら", "星の旅人", "整備士タコ", "宇宙ブイ", "宇宙クリスタル", "出発のベル"];
+const avatarIds=Array.from({ length: 20 }, (_, i) => i + 22);
 const currentAvatarId = (id) => {
   const value = Number(id);
-  return value >= 1 && value <= 4 ? value + 4 : avatarIds.includes(value) ? value : 5;
+  return value >= 1 && value <= 4 ? value + 4 : Number.isInteger(value) && value >= 5 && value <= 41 ? value : 22;
 };
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
@@ -375,7 +375,7 @@ function registration() {
   <fieldset class="visit-days"><legend>来場予約日 *</legend>
     ${visitDates.map(date => `<label><input type="radio" name="visitDate" value="${date}" required ${profile?.visitDate === date ? "checked" : ""}>2127年1月${date.slice(-2)}日</label>`).join("")}
   </fieldset><p class="hint">当日は会場にお並びください。お並びいただいた順にご案内します。</p>
-  <label>アバター *</label><div class="avatars">${avatarIds.map((i) => `<label><img src="assets/avatar-${i}.svg" alt="${avatarNames[i-1]}"><input type="radio" name="avatar" value="${i}" ${i === (avatarIds.includes(profile?.avatarId) ? profile.avatarId : 5) ? "checked" : ""}></label>`).join("")}</div>
+  <label>アバター *</label><div class="avatars">${avatarIds.map((i) => `<label><img src="assets/avatar-${i}.svg" alt="${avatarNames[i-1]}"><input type="radio" name="avatar" value="${i}" ${i === (avatarIds.includes(profile?.avatarId) ? profile.avatarId : 22) ? "checked" : ""}></label>`).join("")}</div>
   <label for="region">出発地（任意）</label><input id="region" maxlength="30" placeholder="例：東京 / 大阪">
   <p class="hint">ニックネーム・アバター・メッセージは公開されます。</p>
   <div class="actions"><button id="start" class="primary">星を選ぶ</button></div></form>
