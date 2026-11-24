@@ -29,10 +29,18 @@ const names = {
 };
 const avatarNames=["宇宙飛行士・ブルー","宇宙飛行士・グリーン","宇宙飛行士・オレンジ","宇宙飛行士・パープル","エイリアン","宇宙ウサギ","宇宙イヌ","宇宙ネコ","ロボット","クラゲ","タコ","キツネ","土星の子","ほのお","UFO","彗星","星くま","月のフクロウ","宇宙クジラ","探査ドローン","星の旅人","ロケット", "おやすみの月", "月面ローバー", "人工衛星", "搭乗券", "銀河カタツムリ", "太陽", "空飛ぶ円盤", "輪っかの土星", "流星", "宇宙グローブ", "オーロラ", "望遠鏡", "居眠り隕石", "星くじら", "星の旅人", "整備士タコ", "宇宙ブイ", "宇宙クリスタル", "出発のベル","月うさぎ通信士", "犬の船長", "航海士ネコ", "星からの旅人", "ロボット船員", "星の旅行者", "整備士キツネ", "天文学者フクロウ", "UFOパイロット", "土星の子", "青い彗星", "おやすみの月", "月面ローバー", "整備士タコ", "星くじら", "ロケットの乗客"];
 const avatarIds=Array.from({ length: 16 }, (_, i) => 42 + i);
-const currentAvatarId = (id) => {
+// 旧版は 1 始まり。後継の役柄がない場合は近いキャラクターに引き継ぐ。
+const legacyAvatars = [
+  57, 50, 54, 46, 45, 42, 43, 44, 46, 55,
+  55, 48, 51, 52, 50, 52, 47, 49, 56, 54,
+  47, 57, 53, 54, 46, 47, 45, 51, 50, 51,
+  52, 57, 52, 49, 53, 56, 47, 55, 54, 47, 46,
+];
+function currentAvatarId(id) {
   const value = Number(id);
-  return value >= 1 && value <= 4 ? value + 4 : Number.isInteger(value) && value >= 5 && value <= avatarNames.length ? value : avatarIds[0];
-};
+  if (avatarIds.includes(value)) return value;
+  return legacyAvatars[value - 1] ?? avatarIds[0];
+}
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
 let planetViewer = null, viewerRequest = 0;
