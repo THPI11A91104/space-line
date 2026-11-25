@@ -628,9 +628,18 @@ async function showPoster() {
     if(request!==viewerRequest)return;
     posterUrl = result.url;
     $("panel").innerHTML =
-      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><button id="all">宇宙に戻る</button><button id="next-person">もう一度体験する</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
+      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><a class="button" id="experience-3d" aria-disabled="true">3D体験（準備中）</a><button id="all">宇宙に戻る</button><button id="next-person">もう一度体験する</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
     $("poster").src = posterUrl;
     $("download").href = posterUrl;
+    const experienceUrl = document.querySelector('meta[name="space-line-3d-url"]').content.trim();
+    if (/^https:\/\//i.test(experienceUrl)) {
+      const link = $("experience-3d");
+      link.href = experienceUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.removeAttribute("aria-disabled");
+      link.textContent = "3D体験へ ↗";
+    }
     $("all").onclick = () => exploreOverview(true);
     $("next-person").onclick = confirmNewParticipant;
     $("my-poster").hidden = false;
