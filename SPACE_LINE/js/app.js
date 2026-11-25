@@ -41,7 +41,7 @@ function currentAvatarId(id) {
   if (avatarIds.includes(value)) return value;
   return legacyAvatars[value - 1] ?? avatarIds[0];
 }
-const testMode = new URLSearchParams(location.search).get("test") === "1";
+const testMode = new URLSearchParams(location.search).get("test") !== "0";
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
 let planetViewer = null, viewerRequest = 0;
