@@ -41,6 +41,7 @@ function currentAvatarId(id) {
   if (avatarIds.includes(value)) return value;
   return legacyAvatars[value - 1] ?? avatarIds[0];
 }
+const testMode = new URLSearchParams(location.search).get("test") === "1";
 const displayNames = { ...names, earth: "地球" };
 const key = "space-line-v2";
 let planetViewer = null, viewerRequest = 0;
@@ -244,6 +245,7 @@ async function exploreOverview(overview = true, planetId = selectedPlanet) {
   $("planet-nav").hidden=false;
   $("space-checkin").hidden=true;
   $("space-find-free").hidden=true;
+  $("back-form").hidden = !!myRecord && !testMode;
   $("back-form").textContent=myRecord?'もう一度体験する':'星を選び直す';
   document.querySelector(".space-target-caption small").textContent=myRecord?"SOLAR SYSTEM":"LANDING POINT";
   $("space-target-name").textContent=myRecord?'太陽系を見渡す':'星を選んで、近づこう';
@@ -362,6 +364,7 @@ function newParticipant() {
   restoringRoute=true;registration();restoringRoute=false;
 }
 function confirmNewParticipant() {
+  if (!testMode) return;
   $("dialog").innerHTML =
     '<h2>もう一度体験しますか？</h2><p>入力画面からやり直します。これまでのチェックインは残ります。</p><div class="actions"><button id="confirm-new" class="primary">もう一度体験する</button><button id="cancel-new">戻る</button></div>';
   $("cancel-new").onclick = () => $("dialog").close();
@@ -390,10 +393,10 @@ function registration() {
   `;
   if (myRecord) {
     $("panel").innerHTML =
-      `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">${pendingMessage()?"続きからポスターをつくる":"作成済みのポスターを見る"}</button>${pendingMessage()?"":'<button id="resume-space">みんなの宇宙を見る</button>'}<button id="new-person">もう一度体験する</button></div>`;
+      `<h1>おかえりなさい。</h1><p>${escape(myRecord.username)}さんの旅の記録が残っています。</p><div class="actions"><button id="resume-poster" class="primary">${pendingMessage()?"続きからポスターをつくる":"作成済みのポスターを見る"}</button>${pendingMessage()?"":'<button id="resume-space">みんなの宇宙を見る</button>'}${testMode ? '<button id="new-person">もう一度体験する</button>' : ''}</div>`;
     $("resume-poster").onclick = pendingMessage()?writeMessage:showPoster;
     if($("resume-space")) $("resume-space").onclick = () => exploreOverview(true);
-    $("new-person").onclick = confirmNewParticipant;
+    if (testMode) $("new-person").onclick = confirmNewParticipant;
     return;
   }
   $("nickname").value = profile?.username || "";
@@ -615,6 +618,32 @@ async function makePoster() {
     planetJapaneseName: names[r.planetId],
   });
 }
+function setupPosterSave(link, hint, url) {
+  link.href = url;
+  const apple = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  link.textContent = "画像をダウンロード";
+  if (!apple || !navigator.canShare || !navigator.share) return;
+
+  const bytes = Uint8Array.from(atob(url.slice(url.indexOf(",") + 1)), c => c.charCodeAt(0));
+  const file = new File([bytes], link.download, { type: "image/png" });
+  if (!navigator.canShare({ files: [file] })) return;
+
+  link.textContent = "写真に保存";
+  hint.textContent = "共有メニューで「画像を保存」を選んでください。";
+  link.onclick = async event => {
+    event.preventDefault();
+    try {
+      await navigator.share({ files: [file] });
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      link.onclick = null;
+      link.textContent = "画像をダウンロード";
+      hint.textContent = "もう一度タップするとPNGをダウンロードできます。";
+    }
+  };
+}
+
 async function showPoster() {
   if (!myRecord) return registration();
   if(pendingMessage())return writeMessage();
@@ -628,9 +657,9 @@ async function showPoster() {
     if(request!==viewerRequest)return;
     posterUrl = result.url;
     $("panel").innerHTML =
-      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><a class="button" id="experience-3d" aria-disabled="true">3D体験（準備中）</a><button id="all">宇宙に戻る</button><button id="next-person">もう一度体験する</button></div><p class="hint">保存できない場合は画像を長押ししてください。</p>`;
+      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions ${testMode ? '' : 'poster-live'}"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><a class="button" id="experience-3d" aria-disabled="true">3D体験（準備中）</a><button id="all">宇宙に戻る</button>${testMode ? '<button id="next-person">もう一度体験する</button>' : ''}</div><p class="hint" id="save-hint" aria-live="polite"></p>`;
     $("poster").src = posterUrl;
-    $("download").href = posterUrl;
+    setupPosterSave($("download"), $("save-hint"), posterUrl);
     const experienceUrl = document.querySelector('meta[name="space-line-3d-url"]').content.trim();
     if (/^https:\/\//i.test(experienceUrl)) {
       const link = $("experience-3d");
@@ -641,7 +670,7 @@ async function showPoster() {
       link.textContent = "3D体験へ ↗";
     }
     $("all").onclick = () => exploreOverview(true);
-    $("next-person").onclick = confirmNewParticipant;
+    if (testMode) $("next-person").onclick = confirmNewParticipant;
     $("my-poster").hidden = false;
   } catch (err) {
     if(request!==viewerRequest)return;

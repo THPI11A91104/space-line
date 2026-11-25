@@ -793,3 +793,7 @@ body[data-view="form"] .panel.poster {
   color: white;
   font-size: 12px;
 }
+
+.panel.poster .poster-live #download {grid-column:1 / -1;}
+.panel.poster .poster-live #all {grid-column:1;grid-row:2;}
+.panel.poster .poster-live #experience-3d {grid-column:2;grid-row:2;}
