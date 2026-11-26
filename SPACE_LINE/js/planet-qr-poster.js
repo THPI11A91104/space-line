@@ -37,8 +37,9 @@ function wrapText(ctx, value, width) {
   return lines;
 }
 
-export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = '', voyageDate = '', planetJapaneseName = '' }) {
+export async function createPlanetQrPoster({ record, coordinates = '', voyageDate = '', planetJapaneseName = '' }) {
   const accent = THEMES[record.planetId];
+  const qrDataUrl = await window.SpaceLineQR.forCheckin(record);
   if (!accent || !qrDataUrl) throw new Error('Poster data unavailable');
   if (document.fonts?.ready) await document.fonts.ready;
   const [planet, qr, logo] = await Promise.all([
@@ -173,5 +174,5 @@ export async function createPlanetQrPoster({ record, qrDataUrl, coordinates = ''
     text('旅のひとこと', 80, messageTop - 12, 32, secondary, 600);
     block(message, messageTop, ink);
   }
-  return { url: canvas.toDataURL('image/png'), hasQR: true };
+  return { url: canvas.toDataURL('image/png'), qrDataUrl };
 }

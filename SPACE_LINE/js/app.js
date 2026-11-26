@@ -1,14 +1,7 @@
-import { createPlanetQrPoster } from "./planet-qr-poster.js?v=97";
+import { createPlanetQrPoster } from "./planet-qr-poster.js?v=103";
+import { coordinateText } from "./landing-coordinates.js";
+import { displayPoster } from "./poster-page.js";
 
-const coordinates = [{"lat": 75.638, "lon": 0.0}, {"lat": 64.992, "lon": 137.508}, {"lat": 57.538, "lon": -84.984}, {"lat": 51.375, "lon": 52.523}, {"lat": 45.951, "lon": -169.969}, {"lat": 41.014, "lon": -32.461}, {"lat": 36.424, "lon": 105.047}, {"lat": 32.09, "lon": -117.446}, {"lat": 27.953, "lon": 20.062}, {"lat": 23.969, "lon": 157.57}, {"lat": 20.106, "lon": -64.922}, {"lat": 16.335, "lon": 72.585}, {"lat": 12.636, "lon": -149.907}, {"lat": 8.989, "lon": -12.399}, {"lat": 5.379, "lon": 125.109}, {"lat": 1.791, "lon": -97.384}, {"lat": -1.791, "lon": 40.124}, {"lat": -5.379, "lon": 177.632}, {"lat": -8.989, "lon": -44.86}, {"lat": -12.636, "lon": 92.648}, {"lat": -16.335, "lon": -129.845}, {"lat": -20.106, "lon": 7.663}, {"lat": -23.969, "lon": 145.171}, {"lat": -27.953, "lon": -77.321}, {"lat": -32.09, "lon": 60.186}, {"lat": -36.424, "lon": -162.306}, {"lat": -41.014, "lon": -24.798}, {"lat": -45.951, "lon": 112.71}, {"lat": -51.375, "lon": -109.783}, {"lat": -57.538, "lon": 27.725}, {"lat": -64.992, "lon": 165.233}, {"lat": -75.638, "lon": -57.259}, {"lat": 69.159, "lon": -142.244}, {"lat": -67.639, "lon": 85.148}, {"lat": -50.752, "lon": -62.95}, {"lat": 10.636, "lon": 100.738}, {"lat": 0.28, "lon": 151.452}, {"lat": 51.645, "lon": 5.854}, {"lat": 17.094, "lon": -39.697}, {"lat": -16.51, "lon": -17.399}, {"lat": -10.067, "lon": -157.834}, {"lat": -27.511, "lon": -104.192}, {"lat": -27.637, "lon": 33.315}, {"lat": 28.27, "lon": -90.411}, {"lat": 28.143, "lon": 47.096}, {"lat": -27.763, "lon": 170.823}, {"lat": 28.398, "lon": 132.081}, {"lat": 6.673, "lon": -126.491}, {"lat": -5.998, "lon": -68.113}, {"lat": 21.242, "lon": -172.469}, {"lat": -20.643, "lon": 115.373}, {"lat": 6.561, "lon": 11.017}, {"lat": -6.11, "lon": 69.394}, {"lat": 69.476, "lon": 80.248}, {"lat": -62.343, "lon": -145.008}, {"lat": -35.25, "lon": 88.766}, {"lat": 40.792, "lon": -141.126}, {"lat": 28.525, "lon": -5.427}, {"lat": 44.443, "lon": 158.688}, {"lat": 36.077, "lon": 76.63}, {"lat": -27.89, "lon": -51.669}, {"lat": -43.664, "lon": 144.216}, {"lat": -35.387, "lon": -133.727}, {"lat": 39.186, "lon": -68.54}, {"lat": -43.51, "lon": 6.708}, {"lat": 58.92, "lon": -41.933}, {"lat": -85.613, "lon": 132.935}, {"lat": -8.028, "lon": -112.974}, {"lat": 54.245, "lon": -119.255}, {"lat": 52.007, "lon": 90.839}, {"lat": -60.7, "lon": -27.562}, {"lat": -53.298, "lon": 62.158}, {"lat": 8.593, "lon": 55.877}, {"lat": 85.613, "lon": 137.508}, {"lat": -11.32, "lon": -85.248}, {"lat": 11.891, "lon": 28.152}, {"lat": 8.706, "lon": -81.63}, {"lat": -48.337, "lon": 171.941}, {"lat": 5.436, "lon": -53.905}, {"lat": -8.141, "lon": 24.534}, {"lat": -4.874, "lon": -3.191}, {"lat": -21.964, "lon": -172.042}, {"lat": 22.69, "lon": -22.562}, {"lat": -22.085, "lon": -34.534}, {"lat": 22.569, "lon": 114.946}, {"lat": 49.186, "lon": 130.963}, {"lat": -42.743, "lon": 39.169}, {"lat": 15.927, "lon": -104.62}, {"lat": 64.338, "lon": 35.388}, {"lat": -4.761, "lon": -140.699}, {"lat": -1.623, "lon": -30.916}, {"lat": 43.51, "lon": -96.266}, {"lat": -73.732, "lon": 40.287}, {"lat": 26.007, "lon": -135.272}, {"lat": -62.829, "lon": 130.008}, {"lat": -11.434, "lon": 52.259}, {"lat": 5.323, "lon": 83.603}, {"lat": 9.386, "lon": 173.323}, {"lat": 72.573, "lon": -77.321}, {"lat": -66.49, "lon": -104.883}, {"lat": 27.007, "lon": -155.334}, {"lat": 41.386, "lon": 28.843}, {"lat": 64.081, "lon": 172.896}, {"lat": 4.649, "lon": -171.351}, {"lat": -8.819, "lon": 129.581}, {"lat": -40.645, "lon": -85.939}, {"lat": 30.583, "lon": -45.551}, {"lat": -29.935, "lon": -11.545}, {"lat": -4.088, "lon": 114.255}, {"lat": 15.114, "lon": 137.935}, {"lat": -14.535, "lon": 164.969}, {"lat": 23.542, "lon": 94.884}, {"lat": -22.933, "lon": -151.98}, {"lat": -43.048, "lon": -45.815}, {"lat": 43.819, "lon": -11.281}, {"lat": 53.298, "lon": -151.716}, {"lat": -18.741, "lon": 75.248}, {"lat": -68.235, "lon": 0.163}, {"lat": 46.355, "lon": -51.405}, {"lat": 33.488, "lon": 169.278}, {"lat": -55.608, "lon": -87.748}, {"lat": -14.651, "lon": -57.523}, {"lat": 15.23, "lon": 0.427}, {"lat": -48.845, "lon": -135.536}, {"lat": -48.675, "lon": 86.957}, {"lat": -32.819, "lon": 133.626}, {"lat": -51.286, "lon": -10.427}, {"lat": 61.628, "lon": 107.974}];
-function spotCoordinates(slotId) {
-  const n = Number(String(slotId).split('-').at(-1)) - 1;
-  return coordinates[n] || coordinates[0];
-}
-function coordinateText(slotId) {
-  const {lat, lon} = spotCoordinates(slotId);
-  return `${Math.abs(lat).toFixed(3)}° ${lat < 0 ? 'S' : 'N'} / ${Math.abs(lon).toFixed(3)}° ${lon < 0 ? 'W' : 'E'}`;
-}
 function voyageTime(createdAt) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) return '2127 —';
@@ -50,8 +43,7 @@ let records = [],
   shared = false,
   ready = false,
   profile = null,
-  myRecord = null,
-  posterUrl = null;
+  myRecord = null;
 const escape = (value) =>
   String(value).replace(
     /[&<>"']/g,
@@ -159,13 +151,6 @@ function renderRecords() {
   if (myRecord) myRecord.avatarId = currentAvatarId(myRecord.avatarId);
   window.SpaceSolar?.setRecords(records);
   planetViewer?.setRecords(records);
-  for (const [id, name] of Object.entries(names)) {
-    const btn = document.querySelector(`[data-planet="${id}"]`);
-    if (btn) {
-      const free = 128 - records.filter((r) => r.planetId === id).length;
-      btn.textContent = name;
-    }
-  }
 }
 window.addEventListener("space-ready", () => {
   ready = true;
@@ -357,7 +342,6 @@ function newParticipant() {
   sessionStorage.removeItem(key + "-profile");
   profile = null;
   myRecord = null;
-  posterUrl = null;
   selectedPlanet="moon";
   window.SpaceSolar?.setBrowseOnly(false);
   document.body.dataset.browseOnly="false";
@@ -581,69 +565,6 @@ function writeMessage() {
     }
   };
 }
-const loadImage = (src) =>
-  new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = src;
-  });
-
-async function makePoster() {
-  const r = myRecord;
-  if (!r || !names[r.planetId]) throw Error("Unknown poster destination");
-
-  const payload = {
-    version: 1,
-    id: r.id,
-    ticketId: r.ticketId,
-    visitDate: r.visitDate,
-    username: r.username,
-    avatarId: r.avatarId,
-    checkin: {
-      planetId: r.planetId,
-      spotId: r.slotId,
-      ...spotCoordinates(r.slotId),
-    },
-    message: r.message,
-  };
-
-  const qrDataUrl = await window.SpaceLineQR.generate(payload);
-
-  return createPlanetQrPoster({
-    record: { ...r, region: r.region ?? profile?.region ?? '' },
-    qrDataUrl,
-    coordinates: coordinateText(r.slotId),
-    voyageDate: voyageTime(r.createdAt),
-    planetJapaneseName: names[r.planetId],
-  });
-}
-function setupPosterSave(link, hint, url) {
-  link.href = url;
-  const apple = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  link.textContent = "画像をダウンロード";
-  if (!apple || !navigator.canShare || !navigator.share) return;
-
-  const bytes = Uint8Array.from(atob(url.slice(url.indexOf(",") + 1)), c => c.charCodeAt(0));
-  const file = new File([bytes], link.download, { type: "image/png" });
-  if (!navigator.canShare({ files: [file] })) return;
-
-  link.textContent = "写真に保存";
-  hint.textContent = "共有メニューで「画像を保存」を選んでください。";
-  link.onclick = async event => {
-    event.preventDefault();
-    try {
-      await navigator.share({ files: [file] });
-    } catch (err) {
-      if (err.name === "AbortError") return;
-      link.onclick = null;
-      link.textContent = "画像をダウンロード";
-      hint.textContent = "もう一度タップするとPNGをダウンロードできます。";
-    }
-  };
-}
-
 async function showPoster() {
   if (!myRecord) return registration();
   if(pendingMessage())return writeMessage();
@@ -653,24 +574,21 @@ async function showPoster() {
   $("panel").className = "panel poster";
   $("panel").innerHTML = "<p>ポスターを作成しています…</p>";
   try {
-    const result = await makePoster();
-    if(request!==viewerRequest)return;
-    posterUrl = result.url;
-    $("panel").innerHTML =
-      `<img class="poster-image" id="poster" alt="宇宙旅行記念ポスター"><div class="actions poster-actions ${testMode ? '' : 'poster-live'}"><a class="button primary" id="download" download="${myRecord.ticketId}.png">画像を保存</a><a class="button" id="experience-3d" aria-disabled="true">3D体験（準備中）</a><button id="all">宇宙に戻る</button>${testMode ? '<button id="next-person">もう一度体験する</button>' : ''}</div><p class="hint" id="save-hint" aria-live="polite"></p>`;
-    $("poster").src = posterUrl;
-    setupPosterSave($("download"), $("save-hint"), posterUrl);
-    const experienceUrl = document.querySelector('meta[name="space-line-3d-url"]').content.trim();
-    if (/^https:\/\//i.test(experienceUrl)) {
-      const link = $("experience-3d");
-      link.href = experienceUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.removeAttribute("aria-disabled");
-      link.textContent = "3D体験へ ↗";
-    }
-    $("all").onclick = () => exploreOverview(true);
-    if (testMode) $("next-person").onclick = confirmNewParticipant;
+    const record = myRecord;
+    const result = await createPlanetQrPoster({
+      record: { ...record, region: record.region ?? profile?.region ?? "" },
+      coordinates: coordinateText(record.slotId),
+      voyageDate: voyageTime(record.createdAt),
+      planetJapaneseName: names[record.planetId],
+    });
+    if (request !== viewerRequest) return;
+    displayPoster($("panel"), {
+      ...result,
+      ticketId: record.ticketId,
+      testMode,
+      onReturn: () => exploreOverview(true),
+      onRestart: confirmNewParticipant,
+    });
     $("my-poster").hidden = false;
   } catch (err) {
     if(request!==viewerRequest)return;
