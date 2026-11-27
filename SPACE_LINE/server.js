@@ -62,11 +62,14 @@ const server = http.createServer(async (req, res) => {
     });
   if (pathname.startsWith("/api/") && req.method === "POST") {
 
-    if (
-      req.headers.origin &&
-      new URL(req.headers.origin).host !== req.headers.host
-    )
-      return json(403, { error: "Origin mismatch" });
+    if (req.headers.origin) {
+      try {
+        if (new URL(req.headers.origin).host !== req.headers.host)
+          return json(403, { error: "Origin mismatch" });
+      } catch {
+        return json(403, { error: "Invalid origin" });
+      }
+    }
     let data;
     try {
       let body = "";
@@ -78,6 +81,8 @@ const server = http.createServer(async (req, res) => {
     } catch {
       return json(400, { error: "Invalid JSON" });
     }
+    if (!data || typeof data !== "object" || Array.isArray(data))
+      return json(400, { error: "Invalid request body" });
     if (
       typeof data.clientId !== "string" ||
       !/^[a-zA-Z0-9-]{20,80}$/.test(data.clientId)
@@ -178,3 +183,4 @@ server.listen(port, "0.0.0.0", () =>
       " / 同じWi-FiのスマホではPCのIPアドレスを使用",
   ),
 );
+
