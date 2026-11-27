@@ -35,17 +35,26 @@ export function displayPoster(panel, { url, qrDataUrl, ticketId, testMode, onRet
       <button id="all">宇宙に戻る</button>
       ${testMode ? '<button id="next-person">もう一度体験する</button>' : ""}
     </div>
-    <p class="hint">ポスターをタップするとQRコードを拡大できます。</p>
+    <button type="button" class="show-qr">QRコードを表示</button>
     <p class="hint" id="save-hint" aria-live="polite"></p>
     <dialog class="scan-dialog" aria-label="読み取り用QRコード">
-      <img alt="搭乗用QRコード">
+      <canvas role="img" aria-label="読み取り用QRコード"></canvas>
       <form method="dialog"><button>閉じる</button></form>
     </dialog>`;
 
   panel.querySelector(".poster-image").src = url;
   const dialog = panel.querySelector(".scan-dialog");
-  dialog.querySelector("img").src = qrDataUrl;
-  panel.querySelector(".poster-preview").onclick = () => dialog.showModal();
+  const qr = new Image();
+  qr.onload = () => {
+    const canvas = dialog.querySelector("canvas");
+    canvas.width = qr.naturalWidth;
+    canvas.height = qr.naturalHeight;
+    canvas.getContext("2d").drawImage(qr, 0, 0);
+  };
+  qr.src = qrDataUrl;
+  const openQr = () => dialog.showModal();
+  panel.querySelector(".poster-preview").onclick = openQr;
+  panel.querySelector(".show-qr").onclick = openQr;
 
   const download = panel.querySelector("#download");
   download.download = ticketId + ".png";
@@ -63,3 +72,4 @@ export function displayPoster(panel, { url, qrDataUrl, ticketId, testMode, onRet
   panel.querySelector("#all").onclick = onReturn;
   if (testMode) panel.querySelector("#next-person").onclick = onRestart;
 }
+

@@ -1566,7 +1566,7 @@ body[data-view="form"] .panel.poster {
 .scan-dialog::backdrop {
   background: rgba(2, 9, 20, 0.94);
 }
-.scan-dialog img {
+.scan-dialog canvas {
   display: block;
   width: 100%;
   max-width: none;
@@ -1580,4 +1580,21 @@ body[data-view="form"] .panel.poster {
 }
 .scan-dialog button {
   width: 100%;
+}
+
+
+.panel.poster .show-qr {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  color: #d9f2ff;
+  font-size: 15px;
+  border-color: #70caff80;
+  touch-action: manipulation;
+}
+.scan-dialog canvas {
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
 }

@@ -1,6 +1,6 @@
 import { createPlanetQrPoster } from "./planet-qr-poster.js?v=103";
 import { coordinateText } from "./landing-coordinates.js";
-import { displayPoster } from "./poster-page.js";
+import { displayPoster } from "./poster-page.js?v=105";
 
 function voyageTime(createdAt) {
   const date = new Date(createdAt);
@@ -602,3 +602,4 @@ await connect();
 let savedRoute;
 try { savedRoute=JSON.parse(sessionStorage.getItem(key+'-route')); } catch {}
 await restoreRoute(savedRoute);
+

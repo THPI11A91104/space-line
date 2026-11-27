@@ -5,15 +5,7 @@ import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 window.SpaceLineQR = {
 
   forCheckin(record) {
-    return this.generate({
-      version: 1,
-      id: record.id,
-      ticketId: record.ticketId,
-      username: record.username,
-      avatarId: record.avatarId,
-      checkin: { planetId: record.planetId, spotId: record.slotId },
-      message: record.message,
-    });
+    return this.generate(record.username);
   },
 
   async generate(profile) {
@@ -21,8 +13,8 @@ window.SpaceLineQR = {
 
     try {
       const dataUrl = await QRCode.toDataURL(textData, {
-        scale: 8,
-        margin: 4,
+        width: 720,
+        margin: 2,
         color: {
           dark: '#000000',
           light: '#ffffff'
