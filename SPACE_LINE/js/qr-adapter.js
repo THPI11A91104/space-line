@@ -5,7 +5,10 @@ import QRCode from 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/+esm';
 window.SpaceLineQR = {
 
   forCheckin(record) {
-    return this.generate(record.username);
+    return this.generate({
+      username: record.username,
+      avatarId: record.avatarId,
+    });
   },
 
   async generate(profile) {
